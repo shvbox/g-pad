@@ -23,14 +23,34 @@ int GMovesModel::columnCount(const QModelIndex &) const
 QVariant GMovesModel::data(const QModelIndex &index, int role) const
 {
     int move = index.row();
-    int line = mGCode->moveToLine(move);
+    int line = targetToSource(move);
     int col = index.column();
     
     switch(role){
+    case GraphicsRole::XYRole: 
+        return mGCode->XY(move);
+        break;
+        
+    case GraphicsRole::ZRole: 
+        return mGCode->Z(move);
+        break;
+        
+    case GraphicsRole::SelectionRole: 
+        return mGCode->selected(line);
+        break;
+        
+    case GraphicsRole::VisibilityRole: 
+        return mGCode->visible(line);
+        break;
+        
+    case GraphicsRole::TypeRole: 
+        return mGCode->moveType(move);
+        break;
+        
     case Qt::DisplayRole: {
         switch (col) {
-        case LineNumberColumn:
-            return line + 1;
+//        case LineNumberColumn:
+//            return line + 1;
         case CodeColumn:
             return mGCode->code(line);
         case XColumn:
@@ -53,51 +73,10 @@ QVariant GMovesModel::data(const QModelIndex &index, int role) const
             break;
         }
     }
-//        qDebug() << (gCode->line(row));
-//        return mGCode->code(row);
-        
-    case Qt::FontRole:
-//        if (col == 0) {
-//            QFont font;
-//            font.setBold(true);
-            
-//            return font;
-//        }
-        break;
-        
-    case Qt::BackgroundRole:
-        if (col == LineNumberColumn) {
-            QBrush gray(QColor("#f0f0f0"));
-            return gray;
-            
-        } else if (mGCode->selected(line)) {
-            QBrush selectColor(QColor("#d0d0d0"));
-            return selectColor;
-        }
-        break;
-        
-    case Qt::ForegroundRole:
-        if (col == LineNumberColumn) {
-            QBrush gray(Qt::gray);
-            return gray;
-        }
-        break;
-        
-    case Qt::TextAlignmentRole:
-        if (col == LineNumberColumn) {
-            return Qt::AlignRight + Qt::AlignVCenter;
-        }
-        break;
-        
-    case Qt::CheckStateRole:
-//        if (row == 1 && col == 0) //add a checkbox to cell(1,0)
-//        {
-//            return Qt::Checked;
-//        }
         break;
     }
-
-    return QVariant();
+    
+    return GAbstractTableModel::data(index, role);
 }
 
 QVariant GMovesModel::headerData(int section, Qt::Orientation orientation, int role) const
@@ -138,13 +117,38 @@ Qt::ItemFlags GMovesModel::flags(const QModelIndex &index) const
     //    return QAbstractTableModel::flags(index) | (index.column() == 1 ? Qt::ItemIsEditable : Qt::NoItemFlags);
 }
 
-int GMovesModel::rowToLine(int row)
+int GMovesModel::targetToSource(int targetRow) const
 {
-    return mGCode->moveToLine(row);
+    return mGCode->moveToLine(targetRow);
 }
 
-int GMovesModel::lineToRow(int line)
+int GMovesModel::sourceToTarget(int sourceRow) const
 {
-    return mGCode->lineToMove(line);
+    return mGCode->lineToMove(sourceRow);
 }
 
+void GMovesModel::selectionUpdated(int top, int bottom)
+{
+//    qDebug() << __PRETTY_FUNCTION__;
+    QVector<int> roles;
+    roles << GraphicsRole::SelectionRole
+          << Qt::FontRole
+          << Qt::ForegroundRole
+          << Qt::BackgroundRole
+          << Qt::TextAlignmentRole;
+    
+    emit dataChanged(index(sourceToTarget(top), LineNumberColumn + 1), index(sourceToTarget(bottom), columnCount() - 1), roles);
+}
+
+void GMovesModel::visibilityUpdated(int top, int bottom)
+{
+//    qDebug() << __PRETTY_FUNCTION__;
+    QVector<int> roles;
+    roles << GraphicsRole::VisibilityRole
+          << Qt::FontRole
+          << Qt::ForegroundRole
+          << Qt::BackgroundRole
+          << Qt::TextAlignmentRole;
+    
+    emit dataChanged(index(sourceToTarget(top), LineNumberColumn), index(sourceToTarget(bottom), LineNumberColumn), roles);
+}

@@ -2,30 +2,31 @@
 #define GMOVENODE_H
 
 #include <QGraphicsItem>
-
-class GMove;
+#include <QPersistentModelIndex>
 
 class GMoveNode : public QGraphicsItem
 {
 public:
-    GMoveNode(int index, QGraphicsItem * parent = 0);
+    GMoveNode(const QPersistentModelIndex &index, QGraphicsItem *parent = 0);
     
-    int index() const { return mIndex; }
-    void setIndex(int index) { mIndex = index; }
-    bool selected() const { return mSelected; }
-    void setSelection(bool state) { mSelected = state; }
+//    void setIn(QGraphicsItem* in);
+//    void setOut(QGraphicsItem* out);
+    
+    QPersistentModelIndex index() const { return mIndex; }
+//    void setIndex(int index) { mIndex = index; }
     
 signals:
     
 public slots:
     
+private:
+    QPersistentModelIndex mIndex;
+    
     // QGraphicsItem interface
 public:
     QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
-    
-    int mIndex;
-    bool mSelected;
+
 };
 
 #endif // GMOVENODE_H

@@ -4,11 +4,17 @@
 #include <QObject>
 #include <QList>
 #include <QVector>
-#include <QMap>
-#include <QRectF>
+#include <QPointF>
 
 #include "gline.h"
 #include "gmove.h"
+
+namespace Units {
+    enum SpeedUnits {
+        mmPerMin,
+        mmPerS
+    };
+}
 
 class GCode : public QObject
 {
@@ -22,48 +28,58 @@ public:
     int linesCount() const { return mLines.size(); }
     int movesCount() const { return mMoves.size(); }
     
-    enum SpeedUnits {
-        mmPerMin,
-        mmPerS
-    };
-    
     // G-Code Lines
     QString line(int line) const { return mLines.at(line)->line(); }
     QString command(int line) const { return mLines.at(line)->command(); }
     QString comment(int line) const { return mLines.at(line)->comment(); }
-    GLine::LineType type(int line) const { return mLines.at(line)->type(); }
+    GLine::LineType lineType(int line) const { return mLines.at(line)->type(); }
     QString code(int line) const { return mLines.at(line)->code(); }
 
     // Moves
     int lineToMove(int line, bool search = false);
-    int moveToLine(int moveRow);
-    double X(int moveRow) const;
-    double Y(int moveRow) const;
-    double Z(int moveRow) const;
-    double E(int moveRow) const;
-    double F(int moveRow) const;
-    double distance(int moveRow) const;
-    double deltaE(int moveRow) const;
-    double flow(int moveRow) const;
+    int moveToLine(int move);
+    double X(int move) const;
+    double Y(int move) const;
+    double Z(int move) const;
+    double E(int move) const;
+    double F(int move) const;
+    double distance(int move) const;
+    double deltaE(int move) const;
+    double flow(int move) const;
+    GMove::MoveType moveType(int move) const;
+    
+    QPointF XY(int move) const;
 
     // Information
-//    QRectF bounds() const;
     
     // Selection
-    bool selected(int row) const { return mSelection.at(row); }
+    bool selected(int line) const { return mSelected.at(line); }
     void selectAll();
-    void select(int row);
-    void select(int first, int last);
+    void select(int line);
+    void select(int firstLine, int lastLine);
     void deselectAll();
-    void deselect(int row);
-    void deselect(int first, int last);
-    bool toggleSelection(int row);
-    void toggleSelection(int first, int last);
+    void deselect(int line);
+    void deselect(int firstLine, int lastLine);
+    bool toggleSelection(int line);
+    void toggleSelection(int firstLine, int lastLine);
+    
+    // Appearance
+    bool visible(int line) const { return mVisible.at(line); }
+    void showAll();
+    void show(int line);
+    void show(int firstLine, int lastLine);
+    void hideAll();
+    void hide(int line);
+    void hide(int firstLine, int lastLine);
+    bool toggleVisible(int line);
+    void toggleVisible(int firstLine, int lastLine);
     
 signals:
     void beginReset();
     void endReset();
-    void changed(int top, int bottom);
+    void dataChanged(int top, int bottom);
+    void selectionChanged(int top, int bottom);
+    void visibilityChanged(int top, int bottom);
     
 public slots:
     
@@ -72,21 +88,16 @@ private:
     void buildMapping();
     void clearMapping();
     
-//    void updateBounds(double X, double Y);
-//    void resetBounds() { mWidth = 100; mHeight = 100; }
-    
-    SpeedUnits mSpeedUnis;
+    Units::SpeedUnits mSpeedUnis;
     
     QList<GLine*> mLines;
     QList<GMove*> mMoves;
-    QMap<int, GMove*> mMovesMap;
     
-    QVector<bool> mSelection;
+    QVector<bool> mSelected;
+    QVector<bool> mVisible;
+    
     QVector<int> mMLMap;
     QVector<int> mLMMap;
-    
-//    double mWidth;
-//    double mHeight;
 };
 
 #endif // GCODE_H

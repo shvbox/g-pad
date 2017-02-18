@@ -25,7 +25,8 @@ GMove::GMove(const QStringList &fields, const GMove &previous)
       mS(0),
       mLen(0.0),
       mDE(0.0),
-      mFlow(0.0)
+      mFlow(0.0),
+      mType(None)
 {
     if (fields.isEmpty() || !testCode(fields.at(0))) {
         return;
@@ -63,13 +64,22 @@ GMove::GMove(const QStringList &fields, const GMove &previous)
     double dY = mY - previous.Y();
     double dZ = mZ - previous.Z();
     mLen = qSqrt(dX * dX + dY * dY + dZ * dZ);
-    if (mLen < 0.0001) {
+    if (qFuzzyCompare(mLen + 1, qreal(1.0))) {
         mLen = 0.0;
     }
     
     mDE = mE - previous.E();
-    
+    if (qFuzzyCompare(mDE + 1, qreal(1.0))) {
+        mDE = 0.0;
+    }
+
     mFlow = mLen == 0.0 ? 0.0 : (mDE / mLen);
+    
+    if (mLen > 0.0) {
+        mType = mDE != 0.0 ? Extrusion : Traverse;
+    } else {
+        mType = mDE > 0.0 ? RetractPrime : RetractSuck;
+    }
 }
 
 bool GMove::testCode(const QString &code)

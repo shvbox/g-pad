@@ -27,57 +27,13 @@ QVariant GCodeModel::data(const QModelIndex &index, int role) const
 
     switch(role){
     case Qt::DisplayRole:
-        if (col == LineNumberColumn) {
-            return (QString("%1").arg(row + 1));
+        if (col == GCodeLineColumn) {
+            return mGCode->line(row);
         }
-
-//        qDebug() << (gCode->line(row));
-        return mGCode->line(row);
-        break;
-        
-    case Qt::FontRole:
-//        if (col == 0) {
-//            QFont font;
-//            font.setBold(true);
-            
-//            return font;
-//        }
-        break;
-        
-    case Qt::BackgroundRole:
-        if (col == LineNumberColumn) {
-            QBrush gray(QColor("#f0f0f0"));
-            return gray;
-            
-        } else if (col == GCodeLineColumn) {
-            if (mGCode->selected(row)) {
-                QBrush selectColor(QColor("#d0d0d0"));
-                return selectColor;
-            }
-        }
-        break;
-        
-    case Qt::ForegroundRole:
-        if (col == LineNumberColumn) {
-            QBrush gray(Qt::gray);
-            return gray;
-        }
-        break;
-        
-    case Qt::TextAlignmentRole:
-        if (col == LineNumberColumn) {
-            return Qt::AlignRight + Qt::AlignVCenter;
-        }
-        break;
-        
-    case Qt::CheckStateRole:
-//        if (col == 0) {
-//            return this->buddy(QModelIndex());
-//        }
         break;
     }
 
-    return QVariant();
+    return GAbstractTableModel::data(index, role);
 }
 
 Qt::ItemFlags GCodeModel::flags(const QModelIndex &index) const

@@ -15,6 +15,7 @@ GGraphicsView::GGraphicsView(QWidget *parent)
 //    setViewportUpdateMode(BoundingRectViewportUpdate);
 //    setRenderHint(QPainter::Antialiasing);
 //    setTransformationAnchor(AnchorUnderMouse);
+    
     qreal s = 96.0 / 24.5;
     scale(s, s);
     //    setMinimumSize(400, 400);
@@ -32,17 +33,8 @@ GGraphicsView::GGraphicsView(QWidget *parent)
     qreal m32 = transform.m32();    // Vertical Position (DY)
     qreal m33 = transform.m33();    // Addtional Projection Factor
     
-    // We need this in a minute
-//    qreal scale = m22;
-    
     // Vertical flip
     m22 = -m22;
-    
-//    // Re-position back to origin
-//    if(m32 > 0)
-//        m32 = 0;
-//    else
-//        m32 = (boundingRect().height() * scale);
     
     // Write back to the matrix
     transform.setMatrix(m11, m12, m13, m21, m22, m23, m31, m32, m33);
@@ -53,12 +45,12 @@ GGraphicsView::GGraphicsView(QWidget *parent)
 
 void GGraphicsView::zoomIn()
 {
-    scaleView(qreal(1.2));
+    scaleView(qreal(1.1));
 }
 
 void GGraphicsView::zoomOut()
 {
-    scaleView(1 / qreal(1.2));
+    scaleView(1 / qreal(1.1));
 }
 
 void GGraphicsView::keyPressEvent(QKeyEvent *event)
@@ -95,14 +87,14 @@ void GGraphicsView::keyPressEvent(QKeyEvent *event)
 void GGraphicsView::wheelEvent(QWheelEvent *event)
 {
 //    scaleView(pow(2.0, event->delta() / 240.0));
-    scaleView(pow(2.0, event->delta() / 400.0));
+    scaleView(pow(1.2, event->delta() / 240.0));
 }
 #endif
 
 void GGraphicsView::scaleView(qreal scaleFactor)
 {
     qreal factor = transform().scale(scaleFactor, scaleFactor).mapRect(QRectF(0, 0, 1, 1)).width();
-    if (factor < 0.07 || factor > 100)
+    if (factor < 1 || factor > 500)
         return;
 
     scale(scaleFactor, scaleFactor);

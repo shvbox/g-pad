@@ -7,9 +7,8 @@
 
 GCode::GCode(QObject *parent) 
     : QObject(parent),
-      mSpeedUnis(mmPerS)
+      mSpeedUnis(Units::mmPerS)
 {
-//    resetBounds();
 }
 
 GCode::~GCode()
@@ -57,9 +56,9 @@ bool GCode::read(const QString &fileName)
     emit beginReset();
     clearMapping();
     clearData();
-//    resetBounds();
     
-    mSelection.clear();
+    mSelected.clear();
+    mVisible.clear();
     
     QTextStream in(&file);
     while (!in.atEnd()) {
@@ -68,8 +67,10 @@ bool GCode::read(const QString &fileName)
     }
     
     int size = mLines.size();
-    mSelection.resize(size);
-    mSelection.fill(false);
+    mSelected.resize(size);
+    mSelected.fill(false);
+    mVisible.resize(size);
+    mVisible.fill(true);
     mMLMap.reserve(size);
     
     GMove *mpp = new GMove();
@@ -80,7 +81,6 @@ bool GCode::read(const QString &fileName)
             mMLMap.append(i);
             GMove *m = new GMove(l->fields(), *mp);
             mMoves.append(m);
-//            updateBounds(m->X(), m->Y());
             mp = m;
         }
     }
@@ -110,101 +110,73 @@ int GCode::lineToMove(int line, bool search)
     return m;
 }
 
-int GCode::moveToLine(int moveRow)
+int GCode::moveToLine(int move)
 {
-    if (moveRow < 0 || moveRow >= mMLMap.size()) {
+    if (move < 0 || move >= mMLMap.size()) {
         return -1;
     }
-    return mMLMap.at(moveRow);
+    return mMLMap.at(move);
 }
 
-double GCode::X(int moveRow) const
+double GCode::X(int move) const
 {
-    if (moveRow < 0 || moveRow >= mMoves.size()) {
-        return 0;
-    }
-    return mMoves.at(moveRow)->X();
+    Q_ASSERT(move >= 0 && move < mMoves.size());
+    return mMoves.at(move)->X();
 }
 
-double GCode::Y(int moveRow) const
+double GCode::Y(int move) const
 {
-    if (moveRow < 0 || moveRow >= mMoves.size()) {
-        return 0;
-    }
-    return mMoves.at(moveRow)->Y();
+    Q_ASSERT(move >= 0 && move < mMoves.size());
+    return mMoves.at(move)->Y();
 }
 
-double GCode::Z(int moveRow) const
+double GCode::Z(int move) const
 {
-    if (moveRow < 0 || moveRow >= mMoves.size()) {
-        return 0;
-    }
-    return mMoves.at(moveRow)->Z();
+    Q_ASSERT(move >= 0 && move < mMoves.size());
+    return mMoves.at(move)->Z();
 }
 
-double GCode::E(int moveRow) const
+double GCode::E(int move) const
 {
-    if (moveRow < 0 || moveRow >= mMoves.size()) {
-        return 0;
-    }
-    return mMoves.at(moveRow)->E();
+    Q_ASSERT(move >= 0 && move < mMoves.size());
+    return mMoves.at(move)->E();
 }
 
-double GCode::F(int moveRow) const
+double GCode::F(int move) const
 {
-    if (moveRow < 0 || moveRow >= mMoves.size()) {
-        return 0;
-    }
-    float f = mMoves.at(moveRow)->F();
-    return mSpeedUnis == mmPerMin ? f : f / 60;
+    Q_ASSERT(move >= 0 && move < mMoves.size());
+    float f = mMoves.at(move)->F();
+    return mSpeedUnis == Units::mmPerMin ? f : f / 60;
 }
 
-double GCode::distance(int moveRow) const
+double GCode::distance(int move) const
 {
-    if (moveRow < 0 || moveRow >= mMoves.size()) {
-        return 0;
-    }
-
-//    float dX = mMoves[moveRow]->X();
-//    float dY = mMoves[moveRow]->Y();
-//    float dZ = mMoves[moveRow]->Z();
-//    if (moveRow > 0) {
-//        int prevRow = moveRow - 1;
-//        dX -= mMoves[prevRow]->X();
-//        dY -= mMoves[prevRow]->Y();
-//        dZ -= mMoves[prevRow]->Z();
-//    }
-//    return qSqrt(dX * dX + dY * dY + dZ * dZ);
-    return mMoves.at(moveRow)->distance();
+    Q_ASSERT(move >= 0 && move < mMoves.size());
+    return mMoves.at(move)->distance();
 }
 
-double GCode::deltaE(int moveRow) const
+double GCode::deltaE(int move) const
 {
-    if (moveRow < 0 || moveRow >= mMoves.size()) {
-        return 0;
-    }
-    
-//    float dE = mMoves[moveRow]->E();
-//    if (moveRow > 0) {
-//        dE -= mMoves[moveRow - 1]->E();
-//    }
-//    return dE;
-    return mMoves.at(moveRow)->deltaE();
+    Q_ASSERT(move >= 0 && move < mMoves.size());
+    return mMoves.at(move)->deltaE();
 }
 
-double GCode::flow(int moveRow) const
+double GCode::flow(int move) const
 {
-    if (moveRow < 0 || moveRow >= mMoves.size()) {
-        return 0;
-    }
-    
-//    float d = distance(moveRow);
-//    if (d == 0) {
-//        return 0;
-//    }
-    
-//    return deltaE(moveRow) / d;
-    return mMoves.at(moveRow)->flow();
+    Q_ASSERT(move >= 0 && move < mMoves.size());
+    return mMoves.at(move)->flow();
+}
+
+GMove::MoveType GCode::moveType(int move) const
+{
+    Q_ASSERT(move >= 0 && move < mMoves.size());
+    return mMoves.at(move)->type();
+}
+
+QPointF GCode::XY(int move) const
+{
+    Q_ASSERT(move >= 0 && move < mMoves.size());
+    return QPointF(mMoves.at(move)->X(), mMoves.at(move)->Y());
 }
 
 //QRectF GCode::bounds() const
@@ -214,96 +186,191 @@ double GCode::flow(int moveRow) const
 
 void GCode::selectAll()
 {
-    mSelection.fill(true);
-    emit changed(0, mLines.size() - 1);
+    select(0, mLines.size() - 1);
+//    mSelected.fill(true);
+//    emit selectionChanged(0, mLines.size() - 1);
 }
 
-void GCode::select(int row)
+void GCode::select(int line)
 {
-    if (row < 0 || row >= mLines.size()) {
-        return;
-    }
-    mSelection[row] = true;
-    emit changed(row, row);
+    Q_ASSERT(line >= 0 && line < mLines.size());
+    if (mSelected[line]) return;
+
+    mSelected[line] = mVisible[line];
+    emit selectionChanged(line, line);
 }
 
-void GCode::select(int first, int last)
+void GCode::select(int firstLine, int lastLine)
 {
-    int min = first; 
-    int max = last; 
-    if (last < first) {
-        min = last; 
-        max = first; 
-    }
-    min = min < 0 ? 0 : min;
-    max = max >= mLines.size() ? mLines.size() - 1 : max;
-    
+    Q_ASSERT(firstLine >= 0 && firstLine < mLines.size());
+    Q_ASSERT(lastLine >= 0 && lastLine < mLines.size());
+    int min = qMin(firstLine, lastLine);
+    int max = qMax(firstLine, lastLine);
+
+    bool changed = false;
     for (int i = min; i <= max; i++) {
-        mSelection[i] = true;
+        changed = changed || (!mSelected[i] && mVisible[i]);
+        mSelected[i] = mVisible[i];
     }
     
-    emit changed(first, last);
+    if (changed) {
+        emit selectionChanged(firstLine, lastLine);
+    }
 }
 
 void GCode::deselectAll()
 {
-    mSelection.fill(false);
-    emit changed(0, mLines.size() - 1);
+    deselect(0, mLines.size() - 1);
+//    mSelected.fill(false);
+//    emit selectionChanged(0, mLines.size() - 1);
 }
 
-void GCode::deselect(int row)
+void GCode::deselect(int line)
 {
-    if (row < 0 || row >= mLines.size()) {
-        return;
-    }
-    mSelection[row] = false;
-    emit changed(row, row);
+    Q_ASSERT(line >= 0 && line < mLines.size());
+    if (!mSelected[line]) return;
+
+    mSelected[line] = false;
+    emit selectionChanged(line, line);
 }
 
-void GCode::deselect(int first, int last)
+void GCode::deselect(int firstLine, int lastLine)
 {
-    int min = first; 
-    int max = last; 
-    if (last < first) {
-        min = last; 
-        max = first; 
+    Q_ASSERT(firstLine >= 0 && firstLine < mLines.size());
+    Q_ASSERT(lastLine >= 0 && lastLine < mLines.size());
+    int min = qMin(firstLine, lastLine);
+    int max = qMax(firstLine, lastLine);
+
+    bool changed = false;
+    for (int i = min; i <= max; i++) {
+        changed = changed || mSelected[i];
+        mSelected[i] = false;
     }
-    min = min < 0 ? 0 : min;
-    max = max >= mLines.size() ? mLines.size() - 1 : max;
+    
+    if (changed) {
+        emit selectionChanged(firstLine, lastLine);
+    }
+}
+
+bool GCode::toggleSelection(int line) 
+{
+    Q_ASSERT(line >= 0 && line < mLines.size());
+    mSelected[line] = !mSelected[line];
+    emit selectionChanged(line, line);
+    return mSelected[line]; 
+}
+
+void GCode::toggleSelection(int firstLine, int lastLine)
+{
+    Q_ASSERT(firstLine >= 0 && firstLine < mLines.size());
+    Q_ASSERT(lastLine >= 0 && lastLine < mLines.size());
+    int min = qMin(firstLine, lastLine);
+    int max = qMax(firstLine, lastLine);
 
     for (int i = min; i <= max; i++) {
-        mSelection[i] = false;
+        mSelected[i] = !mSelected[i];
     }
     
-    emit changed(first, last);
+    emit selectionChanged(firstLine, lastLine);
 }
 
-bool GCode::toggleSelection(int row) 
+void GCode::showAll()
 {
-    if (row < 0 || row >= mLines.size()) {
-        return false;
-    }
-    
-    mSelection[row] = !mSelection[row];
-    emit changed(row, row);
-    return mSelection[row]; 
+    show(0, mLines.size() - 1);
+//    mVisible.fill(true);
+//    emit visibilityChanged(0, mLines.size() - 1);
 }
 
-void GCode::toggleSelection(int first, int last)
+void GCode::show(int line)
 {
-    int min = first; 
-    int max = last; 
-    if (last < first) {
-        min = last; 
-        max = first; 
-    }
-    min = min < 0 ? 0 : min;
-    max = max >= mLines.size() ? mLines.size() - 1 : max;
+    Q_ASSERT(line >= 0 && line < mLines.size());
+    if (mVisible[line]) return;
 
+    mVisible[line] = true;
+    emit visibilityChanged(line, line);
+}
+
+void GCode::show(int firstLine, int lastLine)
+{
+    Q_ASSERT(firstLine >= 0 && firstLine < mLines.size());
+    Q_ASSERT(lastLine >= 0 && lastLine < mLines.size());
+    int min = qMin(firstLine, lastLine);
+    int max = qMax(firstLine, lastLine);
+
+    bool changed = false;
     for (int i = min; i <= max; i++) {
-        mSelection[i] = !mSelection[i];
+        changed = changed || !mVisible[i];
+        mVisible[i] = true;
     }
     
-    emit changed(first, last);
+    if (changed) {
+        emit visibilityChanged(firstLine, lastLine);
+    }
+}
+
+void GCode::hideAll()
+{
+    hide(0, mLines.size() - 1);
+}
+
+void GCode::hide(int line)
+{
+    Q_ASSERT(line >= 0 && line < mLines.size());
+    if (!mVisible[line]) return;
+
+    mVisible[line] = false;
+    deselect(line);
+    emit visibilityChanged(line, line);
+}
+
+void GCode::hide(int firstLine, int lastLine)
+{
+    Q_ASSERT(firstLine >= 0 && firstLine < mLines.size());
+    Q_ASSERT(lastLine >= 0 && lastLine < mLines.size());
+    int min = qMin(firstLine, lastLine);
+    int max = qMax(firstLine, lastLine);
+
+    bool changed = false;
+    for (int i = min; i <= max; i++) {
+        changed = changed || mVisible[i];
+        mVisible[i] = false;
+    }
+    
+    if (changed) {
+        deselect(firstLine, lastLine);
+        emit visibilityChanged(firstLine, lastLine);
+    }
+}
+
+bool GCode::toggleVisible(int line)
+{
+    Q_ASSERT(line >= 0 && line < mLines.size());
+    
+    mVisible[line] = !mVisible[line];
+    if (!mVisible[line]) {
+        deselect(line);
+    }
+    emit visibilityChanged(line, line);
+    return mVisible[line]; 
+}
+
+void GCode::toggleVisible(int firstLine, int lastLine)
+{
+    Q_ASSERT(firstLine >= 0 && firstLine < mLines.size());
+    Q_ASSERT(lastLine >= 0 && lastLine < mLines.size());
+    int min = qMin(firstLine, lastLine);
+    int max = qMax(firstLine, lastLine);
+
+    bool hided = false;
+    for (int i = min; i <= max; i++) {
+        mVisible[i] = !mVisible[i];
+        hided = hided || !mVisible[i];
+    }
+    
+    if (hided) {
+        deselect(firstLine, lastLine);
+    }
+    
+    emit visibilityChanged(firstLine, lastLine);
 }
 

@@ -6,7 +6,7 @@
 class GCode;
 class GCodeModel;
 class GMovesModel;
-class GGraphicsModel;
+class GGraphicsProxy;
 
 namespace Ui {
 class MainWindow;
@@ -53,7 +53,7 @@ private:
     
     GCodeModel *mCodeModel;
     GMovesModel *mMovesModel;
-    GGraphicsModel *mGraphicsModel;
+    GGraphicsProxy *mGraphicsProxy;
     
     enum { MaxRecentFiles = 5 };
     QAction *mRecentFileActs[MaxRecentFiles];

@@ -24,8 +24,9 @@ SOURCES += main.cpp\
     gcodemodel.cpp \
     gcodehighlighterdelegate.cpp \
     ggraphicsview.cpp \
-    ggraphicsmodel.cpp \
-    gmovenode.cpp
+    gmovenode.cpp \
+    ggraphicsproxy.cpp \
+    gmoveline.cpp
 
 HEADERS  += mainwindow.h \
     gcode.h \
@@ -38,7 +39,8 @@ HEADERS  += mainwindow.h \
     gcodemodel.h \
     gcodehighlighterdelegate.h \
     ggraphicsview.h \
-    ggraphicsmodel.h \
-    gmovenode.h
+    gmovenode.h \
+    ggraphicsproxy.h \
+    gmoveline.h
 
 FORMS    += mainwindow.ui

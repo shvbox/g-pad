@@ -12,13 +12,11 @@ public:
     GAbstractTableModel(GCode *data, QObject *parent = 0);
     
     enum { LineNumberColumn = 0 };
-    
-    // QObject interface
-public:
-    virtual bool eventFilter(QObject *obj, QEvent *event);
 
 public slots:
-    virtual void update(int top, int bottom);
+    virtual void dataUpdated(int top, int bottom);
+    virtual void selectionUpdated(int top, int bottom);
+    virtual void visibilityUpdated(int top, int bottom);
     virtual void clicked(const QModelIndex &index);
     virtual void selectionChanged(const QModelIndex &current, const QModelIndex &previous);
     
@@ -27,14 +25,22 @@ protected slots:
     void endResetData();
     
 protected:
-    virtual int rowToLine(int row) { return row; }
-    virtual int lineToRow(int line) { return line; }
+    virtual int targetToSource(int targetRow) const { return targetRow; }
+    virtual int sourceToTarget(int sourceRow) const { return sourceRow; }
     
     GCode *mGCode;
 
     Qt::KeyboardModifiers mKeyModifiers;
     int mPrevRow;
     int mLastEvent;
+    
+    // QObject interface
+public:
+    virtual bool eventFilter(QObject *obj, QEvent *event);
+    
+    // QAbstractItemModel interface
+public:
+    virtual QVariant data(const QModelIndex &index, int role) const;
 };
 
 #endif // GABSTRACTTABLEMODEL_H

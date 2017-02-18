@@ -5,7 +5,7 @@
 #include "gline.h"
 #include "gcodemodel.h"
 #include "gmovesmodel.h"
-#include "ggraphicsmodel.h"
+#include "ggraphicsproxy.h"
 
 #include "gcodehighlighterdelegate.h"
 #include "gtableview.h"
@@ -36,8 +36,8 @@ MainWindow::MainWindow(QWidget *parent) :
     
     // Create Graphics View model
 
-    mGraphicsModel = new GGraphicsModel(mGCode, this);
-    ui->graphicsView->setScene(mGraphicsModel);
+    mGraphicsProxy = new GGraphicsProxy(mMovesModel, this);
+    ui->graphicsView->setScene(mGraphicsProxy);
     
     // Restore window settings
     for (int i = 0; i < MaxRecentFiles; ++i) {
