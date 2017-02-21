@@ -2,6 +2,7 @@
 
 #include <QPainter>
 #include <QPointF>
+#include <QDebug>
 
 #include "gmove.h"
 #include "gmovesmodel.h"
@@ -13,9 +14,9 @@ GMoveNode::GMoveNode(const QPersistentModelIndex &index, QGraphicsItem *parent)
     : QGraphicsItem(parent),
       mIndex(index)
 {
+    setFlag(ItemIsSelectable);// | QGraphicsItem::ItemIsMovable);
     setPos(mIndex.data(GraphicsRole::XYRole).toPointF());
     setZValue(mIndex.data(GraphicsRole::ZRole).toDouble());
-    setFlags(QGraphicsItem::ItemIsSelectable);// | QGraphicsItem::ItemIsMovable);
 }
 
 QRectF GMoveNode::boundingRect() const
@@ -25,10 +26,16 @@ QRectF GMoveNode::boundingRect() const
 
 void GMoveNode::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
-//    setSelected(mIndex.data(GraphicsRole::SelectionRole).toBool());
     QColor c(mIndex.data(GraphicsRole::SelectionRole).toBool() ? Qt::red : Qt::blue);
     painter->setBrush(QBrush(c));
     painter->setPen(QPen(Qt::NoPen));
     painter->setRenderHint(QPainter::Antialiasing);
     painter->drawEllipse(boundingRect());
+}
+
+
+QVariant GMoveNode::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value)
+{
+//    qDebug() << __PRETTY_FUNCTION__ << change;
+    return QGraphicsItem::itemChange(change, value);
 }

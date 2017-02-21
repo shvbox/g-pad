@@ -21,8 +21,8 @@ public slots:
     virtual void selectionChanged(const QModelIndex &current, const QModelIndex &previous);
     
 protected slots:
-    void beginResetData();
-    void endResetData();
+    virtual void beginResetData();
+    virtual void endResetData();
     
 protected:
     virtual int targetToSource(int targetRow) const { return targetRow; }
@@ -41,6 +41,7 @@ public:
     // QAbstractItemModel interface
 public:
     virtual QVariant data(const QModelIndex &index, int role) const;
+    virtual QVariant headerData(int section, Qt::Orientation orientation, int role) const;
 };
 
 #endif // GABSTRACTTABLEMODEL_H

@@ -4,8 +4,10 @@
 #include <QMainWindow>
 
 class GCode;
+class GNavigator;
 class GCodeModel;
 class GMovesModel;
+class GNavigatorModel;
 class GGraphicsProxy;
 
 namespace Ui {
@@ -50,9 +52,11 @@ private:
     Ui::MainWindow *ui;
     
     GCode *mGCode;
+    GNavigator*mNavigator;
     
     GCodeModel *mCodeModel;
     GMovesModel *mMovesModel;
+    GNavigatorModel *mNavModel;
     GGraphicsProxy *mGraphicsProxy;
     
     enum { MaxRecentFiles = 5 };

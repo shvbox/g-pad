@@ -15,6 +15,7 @@ GMoveLine::GMoveLine(GMoveNode *src, GMoveNode *dst, QGraphicsItem *parent)
       mSrc(src),
       mDst(dst)
 {
+//    setCacheMode(ItemCoordinateCache);
     adjust();
 }
 

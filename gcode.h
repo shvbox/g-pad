@@ -27,6 +27,7 @@ public:
 
     int linesCount() const { return mLines.size(); }
     int movesCount() const { return mMoves.size(); }
+//    int zCount() const { return mZs.size(); }
     
     // G-Code Lines
     QString line(int line) const { return mLines.at(line)->line(); }
@@ -51,6 +52,7 @@ public:
     QPointF XY(int move) const;
 
     // Information
+    double zLayer(int layer) const;
     
     // Selection
     bool selected(int line) const { return mSelected.at(line); }
@@ -92,6 +94,7 @@ private:
     
     QList<GLine*> mLines;
     QList<GMove*> mMoves;
+//    QVector<double> mZs;
     
     QVector<bool> mSelected;
     QVector<bool> mVisible;

@@ -26,7 +26,10 @@ SOURCES += main.cpp\
     ggraphicsview.cpp \
     gmovenode.cpp \
     ggraphicsproxy.cpp \
-    gmoveline.cpp
+    gmoveline.cpp \
+    gnavigatormodel.cpp \
+    gnavigatoritem.cpp \
+    gnavigator.cpp
 
 HEADERS  += mainwindow.h \
     gcode.h \
@@ -41,6 +44,9 @@ HEADERS  += mainwindow.h \
     ggraphicsview.h \
     gmovenode.h \
     ggraphicsproxy.h \
-    gmoveline.h
+    gmoveline.h \
+    gnavigatormodel.h \
+    gnavigatoritem.h \
+    gnavigator.h
 
 FORMS    += mainwindow.ui

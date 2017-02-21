@@ -22,6 +22,7 @@ void GCode::clearData()
     mLines.clear();
     qDeleteAll(mMoves);
     mMoves.clear();
+//    mZs.clear();
 }
 
 void GCode::buildMapping()
@@ -75,6 +76,7 @@ bool GCode::read(const QString &fileName)
     
     GMove *mpp = new GMove();
     GMove *mp = mpp;
+//    double z = 0.0;
     for (int i = 0; i < size; ++i) {
         GLine *l = mLines.at(i);
         if (GMove::testCode(l->code())) {
@@ -82,6 +84,11 @@ bool GCode::read(const QString &fileName)
             GMove *m = new GMove(l->fields(), *mp);
             mMoves.append(m);
             mp = m;
+            
+//            if (m->Z() != z) {
+//                z = m->Z();
+//                mZs.append(z);
+//            }
         }
     }
     delete mpp;
@@ -178,6 +185,12 @@ QPointF GCode::XY(int move) const
     Q_ASSERT(move >= 0 && move < mMoves.size());
     return QPointF(mMoves.at(move)->X(), mMoves.at(move)->Y());
 }
+
+//double GCode::zLayer(int layer) const
+//{
+//    Q_ASSERT(layer >= 0 && layer < mZs.size());
+//    return mZs.at(layer);
+//}
 
 //QRectF GCode::bounds() const
 //{

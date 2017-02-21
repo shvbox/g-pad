@@ -49,8 +49,6 @@ QVariant GMovesModel::data(const QModelIndex &index, int role) const
         
     case Qt::DisplayRole: {
         switch (col) {
-//        case LineNumberColumn:
-//            return line + 1;
         case CodeColumn:
             return mGCode->code(line);
         case XColumn:
@@ -81,12 +79,9 @@ QVariant GMovesModel::data(const QModelIndex &index, int role) const
 
 QVariant GMovesModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
-    if (role == Qt::DisplayRole)
-    {
+    if (role == Qt::DisplayRole) {
         if (orientation == Qt::Horizontal) {
             switch (section) {
-            case LineNumberColumn:
-                return QString();
             case CodeColumn:
                 return QString(tr("Code"));
             case XColumn:
@@ -105,17 +100,20 @@ QVariant GMovesModel::headerData(int section, Qt::Orientation orientation, int r
                 return QString("dE");
             case flowColumn:
                 return QString("f");
+            default:
+                break;
             }
         }
     }
-    return QVariant();
+
+    return GAbstractTableModel::headerData(section, orientation, role);
 }
 
-Qt::ItemFlags GMovesModel::flags(const QModelIndex &index) const
-{
-    return QAbstractTableModel::flags(index);
-    //    return QAbstractTableModel::flags(index) | (index.column() == 1 ? Qt::ItemIsEditable : Qt::NoItemFlags);
-}
+//Qt::ItemFlags GMovesModel::flags(const QModelIndex &index) const
+//{
+//    return QAbstractTableModel::flags(index);
+//    //    return QAbstractTableModel::flags(index) | (index.column() == 1 ? Qt::ItemIsEditable : Qt::NoItemFlags);
+//}
 
 int GMovesModel::targetToSource(int targetRow) const
 {

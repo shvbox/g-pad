@@ -26,6 +26,7 @@ GLine::GLine(const QString &line)
             mLineType = Command;
         }
         
+        mCommand = mCommand.toUpper();
         if (mLineType == Command) {
             mFields = mCommand.split(fieldsSplitter, QString::SkipEmptyParts);
         }

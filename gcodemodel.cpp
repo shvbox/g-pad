@@ -38,7 +38,7 @@ QVariant GCodeModel::data(const QModelIndex &index, int role) const
 
 Qt::ItemFlags GCodeModel::flags(const QModelIndex &index) const
 {
-    return QAbstractTableModel::flags(index);
+    return GAbstractTableModel::flags(index);
 //    return (index.column() == LineNumberColumn ? Qt::ItemIsUserCheckable : Qt::NoItemFlags) | QAbstractTableModel::flags(index);
     //    return QAbstractTableModel::flags(index) | (index.column() == 1 ? Qt::ItemIsEditable : Qt::NoItemFlags);
 }

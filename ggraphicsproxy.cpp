@@ -40,16 +40,15 @@ void GGraphicsProxy::resetData()
 {
     clear();
     mIndexToNodes.clear();
-    
     GMoveNode* prevNode = NULL;
     for (int i = 0; i < mModel->rowCount(); ++i) {
         QPersistentModelIndex index = mModel->index(i, 0);
         GMoveNode* node = new GMoveNode(index);
 
-        mIndexToNodes.insert(index, node);
-        
         addItem(node);
         addItem(new GMoveLine(prevNode, node));
+        
+        mIndexToNodes.insert(index, node);
         
         prevNode = node;
     }

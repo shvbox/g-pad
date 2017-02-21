@@ -27,6 +27,10 @@ public:
     QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
+    
+    // QGraphicsItem interface
+protected:
+    virtual QVariant itemChange(GraphicsItemChange change, const QVariant &value);
 };
 
 #endif // GMOVENODE_H

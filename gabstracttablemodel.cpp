@@ -144,7 +144,6 @@ void GAbstractTableModel::endResetData()
 {
     mKeyModifiers = 0;
     mPrevRow = -1;
-    
     endResetModel();
 }
 
@@ -213,13 +212,37 @@ QVariant GAbstractTableModel::data(const QModelIndex &index, int role) const
         }
         break;
         
-    case Qt::TextAlignmentRole:
-        if (col == LineNumberColumn) {
-            return Qt::AlignRight + Qt::AlignVCenter;
-        }
-        break;
+//    case Qt::TextAlignmentRole:
+//        if (col == LineNumberColumn) {
+//            return Qt::AlignRight + Qt::AlignVCenter;
+//        }
+//        break;
     }
 
     return QVariant();
+}
 
+QVariant GAbstractTableModel::headerData(int section, Qt::Orientation orientation, int role) const
+{
+    if (role == Qt::DisplayRole) {
+        if (orientation == Qt::Horizontal) {
+            if (section == LineNumberColumn) {
+                return mGCode->linesCount();
+            }
+        }
+        
+    } else if (role == Qt::ForegroundRole) {
+        if (section == LineNumberColumn) {
+            return QBrush(Qt::transparent);
+        }
+        
+    } else if (role == Qt::FontRole) {
+        if (section == LineNumberColumn) {
+            QFont font;
+            font.setBold(true);
+            return font;
+        }
+    }
+    
+    return QAbstractItemModel::headerData(section, orientation, role);
 }

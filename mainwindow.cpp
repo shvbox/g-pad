@@ -2,9 +2,11 @@
 #include "ui_mainwindow.h"
 
 #include "gcode.h"
+#include "gnavigator.h"
 #include "gline.h"
 #include "gcodemodel.h"
 #include "gmovesmodel.h"
+#include "gnavigatormodel.h"
 #include "ggraphicsproxy.h"
 
 #include "gcodehighlighterdelegate.h"
@@ -25,6 +27,7 @@ MainWindow::MainWindow(QWidget *parent) :
     
     // Create data
     mGCode = new GCode(this);
+    mNavigator= new GNavigator(mGCode, this);
     
     // Create G-Code View model
     mCodeModel = new GCodeModel(mGCode, this);
@@ -34,10 +37,12 @@ MainWindow::MainWindow(QWidget *parent) :
     mMovesModel = new GMovesModel(mGCode, this);
     ui->movesView->setModel(mMovesModel);
     
-    // Create Graphics View model
-
+    // Create Graphics Proxy model
     mGraphicsProxy = new GGraphicsProxy(mMovesModel, this);
     ui->graphicsView->setScene(mGraphicsProxy);
+    
+    mNavModel = new GNavigatorModel(mNavigator, this);
+    ui->navigatorView->setModel(mNavModel);
     
     // Restore window settings
     for (int i = 0; i < MaxRecentFiles; ++i) {
@@ -49,7 +54,6 @@ MainWindow::MainWindow(QWidget *parent) :
     for (int i = 0; i < MaxRecentFiles; ++i) {
         ui->menuRecentFiles->addAction(mRecentFileActs[i]);
     }
-    
     
     connect(ui->actionOpen, SIGNAL(triggered()), this, SLOT(openFile()));
     connect(mCodeModel, SIGNAL(modelReset()), this, SLOT(resizeTableColumns()));
@@ -165,14 +169,11 @@ void MainWindow::resizeTableColumns()
 
     // Resize columns
     ui->codeView->scrollToBottom();
-
-    ui->movesView->resizeColumnToContents(GMovesModel::LineNumberColumn);
-//    ui->movesView->resizeColumnToContents(GMovesModel::CodeColumn);
-    
     ui->codeView->resizeColumnToContents(GCodeModel::LineNumberColumn);
     ui->codeView->resizeColumnToContents(GCodeModel::GCodeLineColumn);
-    
     ui->codeView->scrollToTop();
+    
+    ui->movesView->resizeColumnToContents(GMovesModel::LineNumberColumn);
     
     // Setup synchronous scrolling
     connect(ui->codeView->verticalScrollBar(), SIGNAL(valueChanged(int)), this, SLOT(syncMovesViewScroll(int)));
@@ -191,8 +192,11 @@ void MainWindow::readSettings()
     
     restoreState(s.value("MainWindow/state").toByteArray());
         
-    QByteArray headers = s.value("MovesView/headers", "").toByteArray();
-    ui->movesView->horizontalHeader()->restoreState(headers);
+    QByteArray moves = s.value("MovesView/headers", "").toByteArray();
+    ui->movesView->horizontalHeader()->restoreState(moves);
+    
+    QByteArray navigator = s.value("NavigatorView/headers", "").toByteArray();
+    ui->navigatorView->header()->restoreState(navigator);
     
     updateRecentFileActions();
 }
@@ -203,8 +207,11 @@ void MainWindow::writeSettings()
     s.setValue("MainWindow/geometry", saveGeometry());
     s.setValue("MainWindow/state", saveState());
     
-    QByteArray headers = ui->movesView->horizontalHeader()->saveState();
-    s.setValue("MovesView/headers", headers);
+    QByteArray moves = ui->movesView->horizontalHeader()->saveState();
+    s.setValue("MovesView/headers", moves);
+    
+    QByteArray navigator = ui->navigatorView->header()->saveState();
+    s.setValue("NavigatorView/headers", navigator);
 }
 
 void MainWindow::setCurrentFile(const QString &fileName)
