@@ -1,0 +1,16 @@
+#ifndef GFILTERMODEL_H
+#define GFILTERMODEL_H
+
+#include <QSortFilterProxyModel>
+
+class GFilterModel : public QSortFilterProxyModel
+{
+public:
+    explicit GFilterModel(QObject * parent = 0);
+    
+    // QSortFilterProxyModel interface
+protected:
+    bool filterAcceptsRow(int source_row, const QModelIndex &source_parent) const;
+};
+
+#endif // GFILTERMODEL_H

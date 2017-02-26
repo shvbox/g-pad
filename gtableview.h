@@ -3,7 +3,8 @@
 
 #include <QTableView>
 
-#include "gabstracttablemodel.h"
+class GAbstractTableModel;
+class GFilterProxy;
 
 class GTableView : public QTableView
 {
@@ -17,12 +18,15 @@ public:
     
 public slots:
     
+private:
+    GAbstractTableModel *mGModel;
+    GFilterProxy *mGProxy;
+    
     // QAbstractItemView interface
 protected slots:
     void currentChanged(const QModelIndex &current, const QModelIndex &previous);
-    
-private:
-    GAbstractTableModel *mGModel;
+    void selectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
+    void scrollToCurrent();
 };
 
 #endif // GTABLEVIEW_H

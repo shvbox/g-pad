@@ -4,7 +4,9 @@
 #include <QObject>
 #include <QHash>
 
-class GCode;
+#include "gcode.h"
+
+//class GCode;
 class GNavigatorItem;
 
 class GNavigator : public QObject
@@ -13,23 +15,35 @@ class GNavigator : public QObject
 public:
     GNavigator(GCode *data, QObject *parent = 0);
     virtual ~GNavigator();
+ 
+    enum { 
+        Visible = 0,
+        PartiallyVisible,
+        Invisible
+    };
+    
+    int testVisibility(GNavigatorItem* item);
     
     GNavigatorItem* root() const { return mRootItem; }
 //    GNavigatorItem* parent(GNavigatorItem* child) const;
 //    GNavigatorItem* child(GNavigatorItem* parent) const;
     
 signals:
+    void dataChanged(int top, int bottom);
+    void selectionChanged(int top, int bottom);
+    void visibilityChanged(int top, int bottom);
     void beginReset();
     void endReset();
     
 public slots:
     
-private slots:
+protected slots:
     void beginResetData();
     void endResetData();
     
 private:
     void setupModelData();
+    
     
     GCode *mGCode;
     GNavigatorItem *mRootItem;

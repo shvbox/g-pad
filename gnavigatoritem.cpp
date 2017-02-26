@@ -3,10 +3,12 @@
 #include <QStringList>
 #include <QDebug>
 
-GNavigatorItem::GNavigatorItem(const QList<QVariant> &data, GNavigatorItem *parent)
+GNavigatorItem::GNavigatorItem(int firstLine, int lastLine, const QList<QVariant> &data, GNavigatorItem *parent)
+    : mParentItem(parent),
+      mItemData(data),
+      mFirstLine(firstLine),
+      mLastLine(lastLine)
 {
-    mParentItem = parent;
-    mItemData = data;
 }
 
 GNavigatorItem::~GNavigatorItem()

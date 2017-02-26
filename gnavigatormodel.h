@@ -14,13 +14,19 @@ public:
     ~GNavigatorModel();
     
 public:
+    enum { LineNumberColumn = 0 };
 //    enum { GCodeLineColumn = LineNumberColumn + 1 };
     
 signals:
     
 public slots:
+    void clicked(const QModelIndex &index);
+    void currentChanged(const QModelIndex &current);
     
 protected slots:
+    void dataUpdated(int top, int bottom);
+    void selectionUpdated(int top, int bottom);
+    void visibilityUpdated(int top, int bottom);
     void beginResetData();
     void endResetData();
     

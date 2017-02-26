@@ -1,0 +1,12 @@
+#include "gfiltermodel.h"
+
+GFilterModel::GFilterModel(QObject *parent)
+    : QSortFilterProxyModel(parent)
+{
+    
+}
+
+bool GFilterModel::filterAcceptsRow(int source_row, const QModelIndex &source_parent) const
+{
+    return true;
+}

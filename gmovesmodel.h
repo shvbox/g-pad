@@ -3,16 +3,6 @@
 
 #include "gabstracttablemodel.h"
 
-namespace GraphicsRole {
-    enum {
-        XYRole = Qt::UserRole,
-        ZRole,
-        SelectionRole,
-        VisibilityRole,
-        TypeRole
-    };
-}
-
 class GMovesModel : public GAbstractTableModel
 {
     Q_OBJECT
@@ -50,8 +40,6 @@ public:
 protected:
     int targetToSource(int targetRow) const;
     int sourceToTarget(int sourceRow) const;
-    void selectionUpdated(int top, int bottom);
-    void visibilityUpdated(int top, int bottom);
 };
 
 #endif // GMOVESMODEL_H

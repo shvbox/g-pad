@@ -4,21 +4,18 @@
 #include <QObject>
 #include <QList>
 #include <QVector>
+#include <QBitArray>
 #include <QPointF>
 
+#include "g.h"
 #include "gline.h"
 #include "gmove.h"
-
-namespace Units {
-    enum SpeedUnits {
-        mmPerMin,
-        mmPerS
-    };
-}
 
 class GCode : public QObject
 {
     Q_OBJECT
+    friend class GNavigator;
+
 public:
     explicit GCode(QObject *parent = 0);
     ~GCode();
@@ -66,7 +63,7 @@ public:
     void toggleSelection(int firstLine, int lastLine);
     
     // Appearance
-    bool visible(int line) const { return mVisible.at(line); }
+    bool visible(int line) const { return mVisible.testBit(line); }
     void showAll();
     void show(int line);
     void show(int firstLine, int lastLine);
@@ -96,8 +93,8 @@ private:
     QList<GMove*> mMoves;
 //    QVector<double> mZs;
     
-    QVector<bool> mSelected;
-    QVector<bool> mVisible;
+    QBitArray mSelected;
+    QBitArray mVisible;
     
     QVector<int> mMLMap;
     QVector<int> mLMMap;

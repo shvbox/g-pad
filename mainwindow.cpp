@@ -8,6 +8,7 @@
 #include "gmovesmodel.h"
 #include "gnavigatormodel.h"
 #include "ggraphicsproxy.h"
+#include "gfilterproxy.h"
 
 #include "gcodehighlighterdelegate.h"
 #include "gtableview.h"
@@ -22,7 +23,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     
-    GCodeHighlighterDelegate* codeHighlighter = new GCodeHighlighterDelegate();
+    GCodeHighlighterDelegate* codeHighlighter = new GCodeHighlighterDelegate(ui->codeView);
     ui->codeView->setItemDelegateForColumn(GCodeModel::GCodeLineColumn, codeHighlighter);
     
     // Create data
@@ -31,11 +32,15 @@ MainWindow::MainWindow(QWidget *parent) :
     
     // Create G-Code View model
     mCodeModel = new GCodeModel(mGCode, this);
-    ui->codeView->setModel(mCodeModel);
+    mCodeProxy = new GFilterProxy(this);
+    mCodeProxy->setSourceModel(mCodeModel);
+    ui->codeView->setModel(mCodeProxy);
     
     // Create Moves View model
     mMovesModel = new GMovesModel(mGCode, this);
-    ui->movesView->setModel(mMovesModel);
+    mMovesProxy = new GFilterProxy(this);
+    mMovesProxy->setSourceModel(mMovesModel);
+    ui->movesView->setModel(mMovesProxy);
     
     // Create Graphics Proxy model
     mGraphicsProxy = new GGraphicsProxy(mMovesModel, this);
@@ -43,6 +48,8 @@ MainWindow::MainWindow(QWidget *parent) :
     
     mNavModel = new GNavigatorModel(mNavigator, this);
     ui->navigatorView->setModel(mNavModel);
+    connect((ui->navigatorView), SIGNAL(activated(QModelIndex)), mNavModel, SLOT(clicked(QModelIndex)));
+//    connect((ui->navigatorView), SIGNAL(), mNavModel, SLOT(clicked(QModelIndex)));
     
     // Restore window settings
     for (int i = 0; i < MaxRecentFiles; ++i) {
@@ -56,7 +63,11 @@ MainWindow::MainWindow(QWidget *parent) :
     }
     
     connect(ui->actionOpen, SIGNAL(triggered()), this, SLOT(openFile()));
+    connect(ui->actionFilter, SIGNAL(triggered(bool)), mCodeProxy, SLOT(toggleFilter(bool)));
+    connect(ui->actionFilter, SIGNAL(triggered(bool)), mMovesProxy, SLOT(toggleFilter(bool)));
     connect(mCodeModel, SIGNAL(modelReset()), this, SLOT(resizeTableColumns()));
+    
+    ui->actionFilter->trigger();
 }
 
 

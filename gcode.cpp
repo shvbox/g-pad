@@ -5,6 +5,7 @@
 #include <QTextStream>
 #include <algorithm>
 
+
 GCode::GCode(QObject *parent) 
     : QObject(parent),
       mSpeedUnis(Units::mmPerS)
@@ -68,10 +69,8 @@ bool GCode::read(const QString &fileName)
     }
     
     int size = mLines.size();
-    mSelected.resize(size);
-    mSelected.fill(false);
-    mVisible.resize(size);
-    mVisible.fill(true);
+    mSelected.fill(false, size);
+    mVisible.fill(true, size);
     mMLMap.reserve(size);
     
     GMove *mpp = new GMove();
@@ -200,30 +199,32 @@ QPointF GCode::XY(int move) const
 void GCode::selectAll()
 {
     select(0, mLines.size() - 1);
-//    mSelected.fill(true);
-//    emit selectionChanged(0, mLines.size() - 1);
 }
 
 void GCode::select(int line)
 {
     Q_ASSERT(line >= 0 && line < mLines.size());
-    if (mSelected[line]) return;
-
-    mSelected[line] = mVisible[line];
-    emit selectionChanged(line, line);
+    if (mSelected.testBit(line)) return;
+    if (mVisible.testBit(line)) {
+        mSelected.setBit(line);
+        emit selectionChanged(line, line);
+    }
 }
 
 void GCode::select(int firstLine, int lastLine)
 {
+//    qDebug() << __PRETTY_FUNCTION__ << firstLine << lastLine;
     Q_ASSERT(firstLine >= 0 && firstLine < mLines.size());
     Q_ASSERT(lastLine >= 0 && lastLine < mLines.size());
     int min = qMin(firstLine, lastLine);
     int max = qMax(firstLine, lastLine);
 
     bool changed = false;
-    for (int i = min; i <= max; i++) {
-        changed = changed || (!mSelected[i] && mVisible[i]);
-        mSelected[i] = mVisible[i];
+    for (int i = min; i <= max; ++i) {
+        if (mVisible.testBit(i)) {
+            changed = changed || !mSelected.testBit(i);
+            mSelected.setBit(i);
+        }
     }
     
     if (changed) {
@@ -234,30 +235,29 @@ void GCode::select(int firstLine, int lastLine)
 void GCode::deselectAll()
 {
     deselect(0, mLines.size() - 1);
-//    mSelected.fill(false);
-//    emit selectionChanged(0, mLines.size() - 1);
 }
 
 void GCode::deselect(int line)
 {
     Q_ASSERT(line >= 0 && line < mLines.size());
-    if (!mSelected[line]) return;
+    if (!mSelected.testBit(line)) return;
 
-    mSelected[line] = false;
+    mSelected.clearBit(line);
     emit selectionChanged(line, line);
 }
 
 void GCode::deselect(int firstLine, int lastLine)
 {
+//    qDebug() << __PRETTY_FUNCTION__ << firstLine << lastLine;
     Q_ASSERT(firstLine >= 0 && firstLine < mLines.size());
     Q_ASSERT(lastLine >= 0 && lastLine < mLines.size());
     int min = qMin(firstLine, lastLine);
     int max = qMax(firstLine, lastLine);
 
     bool changed = false;
-    for (int i = min; i <= max; i++) {
-        changed = changed || mSelected[i];
-        mSelected[i] = false;
+    for (int i = min; i <= max; ++i) {
+        changed = changed || mSelected.testBit(i);
+        mSelected.clearBit(i);
     }
     
     if (changed) {
@@ -268,20 +268,25 @@ void GCode::deselect(int firstLine, int lastLine)
 bool GCode::toggleSelection(int line) 
 {
     Q_ASSERT(line >= 0 && line < mLines.size());
-    mSelected[line] = !mSelected[line];
-    emit selectionChanged(line, line);
-    return mSelected[line]; 
+    if (mVisible.testBit(line)) {
+        mSelected.toggleBit(line);
+        emit selectionChanged(line, line);
+    }
+    return mSelected.testBit(line); 
 }
 
 void GCode::toggleSelection(int firstLine, int lastLine)
 {
+//    qDebug() << __PRETTY_FUNCTION__ << firstLine << lastLine;
     Q_ASSERT(firstLine >= 0 && firstLine < mLines.size());
     Q_ASSERT(lastLine >= 0 && lastLine < mLines.size());
     int min = qMin(firstLine, lastLine);
     int max = qMax(firstLine, lastLine);
 
     for (int i = min; i <= max; i++) {
-        mSelected[i] = !mSelected[i];
+        if (mVisible.testBit(i)) {
+            mSelected.toggleBit(i);
+        }
     }
     
     emit selectionChanged(firstLine, lastLine);
@@ -290,16 +295,14 @@ void GCode::toggleSelection(int firstLine, int lastLine)
 void GCode::showAll()
 {
     show(0, mLines.size() - 1);
-//    mVisible.fill(true);
-//    emit visibilityChanged(0, mLines.size() - 1);
 }
 
 void GCode::show(int line)
 {
     Q_ASSERT(line >= 0 && line < mLines.size());
-    if (mVisible[line]) return;
+    if (mVisible.testBit(line)) return;
 
-    mVisible[line] = true;
+    mVisible.setBit(line);
     emit visibilityChanged(line, line);
 }
 
@@ -312,8 +315,8 @@ void GCode::show(int firstLine, int lastLine)
 
     bool changed = false;
     for (int i = min; i <= max; i++) {
-        changed = changed || !mVisible[i];
-        mVisible[i] = true;
+        changed = changed || !mVisible.testBit(i);
+        mVisible.setBit(i);
     }
     
     if (changed) {
@@ -323,35 +326,39 @@ void GCode::show(int firstLine, int lastLine)
 
 void GCode::hideAll()
 {
+//    qDebug() << __PRETTY_FUNCTION__;
     hide(0, mLines.size() - 1);
 }
 
 void GCode::hide(int line)
 {
     Q_ASSERT(line >= 0 && line < mLines.size());
-    if (!mVisible[line]) return;
+    if (!mVisible.testBit(line)) return;
 
-    mVisible[line] = false;
+    mVisible.clearBit(line);
     deselect(line);
     emit visibilityChanged(line, line);
 }
 
 void GCode::hide(int firstLine, int lastLine)
 {
+//    qDebug() << __PRETTY_FUNCTION__ << firstLine << lastLine;
     Q_ASSERT(firstLine >= 0 && firstLine < mLines.size());
     Q_ASSERT(lastLine >= 0 && lastLine < mLines.size());
     int min = qMin(firstLine, lastLine);
     int max = qMax(firstLine, lastLine);
 
     bool changed = false;
-    for (int i = min; i <= max; i++) {
-        changed = changed || mVisible[i];
-        mVisible[i] = false;
+    for (int i = min; i <= max; ++i) {
+        changed = changed || mVisible.testBit(i);
+        mVisible.clearBit(i);
     }
     
     if (changed) {
+//        qDebug() << __PRETTY_FUNCTION__ << firstLine << lastLine;
         deselect(firstLine, lastLine);
         emit visibilityChanged(firstLine, lastLine);
+//        qDebug() << __PRETTY_FUNCTION__ << "!" << firstLine << lastLine;
     }
 }
 
@@ -359,12 +366,12 @@ bool GCode::toggleVisible(int line)
 {
     Q_ASSERT(line >= 0 && line < mLines.size());
     
-    mVisible[line] = !mVisible[line];
-    if (!mVisible[line]) {
+    mVisible.toggleBit(line);
+    if (!mVisible.testBit(line)) {
         deselect(line);
     }
     emit visibilityChanged(line, line);
-    return mVisible[line]; 
+    return mVisible.testBit(line);
 }
 
 void GCode::toggleVisible(int firstLine, int lastLine)
@@ -376,11 +383,12 @@ void GCode::toggleVisible(int firstLine, int lastLine)
 
     bool hided = false;
     for (int i = min; i <= max; i++) {
-        mVisible[i] = !mVisible[i];
-        hided = hided || !mVisible[i];
+        mVisible.toggleBit(i);
+        hided = hided || !mVisible.testBit(i);
     }
     
     if (hided) {
+        qDebug() << __PRETTY_FUNCTION__ << firstLine << lastLine;
         deselect(firstLine, lastLine);
     }
     

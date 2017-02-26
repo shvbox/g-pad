@@ -14,13 +14,13 @@ public:
     enum { LineNumberColumn = 0 };
 
 public slots:
+    virtual void clicked(const QModelIndex &index);
+    virtual void currentChanged(const QModelIndex &current);
+    
+protected slots:
     virtual void dataUpdated(int top, int bottom);
     virtual void selectionUpdated(int top, int bottom);
     virtual void visibilityUpdated(int top, int bottom);
-    virtual void clicked(const QModelIndex &index);
-    virtual void selectionChanged(const QModelIndex &current, const QModelIndex &previous);
-    
-protected slots:
     virtual void beginResetData();
     virtual void endResetData();
     
@@ -31,8 +31,8 @@ protected:
     GCode *mGCode;
 
     Qt::KeyboardModifiers mKeyModifiers;
-    int mPrevRow;
-    int mLastEvent;
+    int mPrevLine;
+    QModelIndex mCurrentIndex;
     
     // QObject interface
 public:

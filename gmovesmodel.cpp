@@ -27,23 +27,15 @@ QVariant GMovesModel::data(const QModelIndex &index, int role) const
     int col = index.column();
     
     switch(role){
-    case GraphicsRole::XYRole: 
+    case G::MoveXYRole: 
         return mGCode->XY(move);
         break;
         
-    case GraphicsRole::ZRole: 
+    case G::MoveZRole: 
         return mGCode->Z(move);
         break;
         
-    case GraphicsRole::SelectionRole: 
-        return mGCode->selected(line);
-        break;
-        
-    case GraphicsRole::VisibilityRole: 
-        return mGCode->visible(line);
-        break;
-        
-    case GraphicsRole::TypeRole: 
+    case G::MoveTypeRole: 
         return mGCode->moveType(move);
         break;
         
@@ -123,30 +115,4 @@ int GMovesModel::targetToSource(int targetRow) const
 int GMovesModel::sourceToTarget(int sourceRow) const
 {
     return mGCode->lineToMove(sourceRow);
-}
-
-void GMovesModel::selectionUpdated(int top, int bottom)
-{
-//    qDebug() << __PRETTY_FUNCTION__;
-    QVector<int> roles;
-    roles << GraphicsRole::SelectionRole
-          << Qt::FontRole
-          << Qt::ForegroundRole
-          << Qt::BackgroundRole
-          << Qt::TextAlignmentRole;
-    
-    emit dataChanged(index(sourceToTarget(top), LineNumberColumn + 1), index(sourceToTarget(bottom), columnCount() - 1), roles);
-}
-
-void GMovesModel::visibilityUpdated(int top, int bottom)
-{
-//    qDebug() << __PRETTY_FUNCTION__;
-    QVector<int> roles;
-    roles << GraphicsRole::VisibilityRole
-          << Qt::FontRole
-          << Qt::ForegroundRole
-          << Qt::BackgroundRole
-          << Qt::TextAlignmentRole;
-    
-    emit dataChanged(index(sourceToTarget(top), LineNumberColumn), index(sourceToTarget(bottom), LineNumberColumn), roles);
 }

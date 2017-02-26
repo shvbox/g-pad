@@ -6,6 +6,9 @@
 
 class GCodeHighlighterDelegate : public QStyledItemDelegate
 {
+public:
+    explicit GCodeHighlighterDelegate(QObject * parent = 0);
+    
 protected:
     void paint(QPainter* painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
     QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const;

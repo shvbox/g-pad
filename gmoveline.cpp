@@ -2,10 +2,10 @@
 
 #include <QPainter>
 
+#include "g.h"
 #include "gmovenode.h"
 #include "gmove.h"
 #include "gmovesmodel.h"
-
 
 static const qreal W = 0.2;
 static const qreal HW = W / 2;
@@ -52,7 +52,7 @@ void GMoveLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
         
     } else {
         if (mDst) {
-            switch (mDst->index().data(GraphicsRole::TypeRole).toInt()) {
+            switch (mDst->index().data(G::MoveTypeRole).toInt()) {
 //            case GMove::Extrusion:
 //                b.setColor(Qt::black);
 //                break;

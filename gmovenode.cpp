@@ -4,6 +4,7 @@
 #include <QPointF>
 #include <QDebug>
 
+#include "g.h"
 #include "gmove.h"
 #include "gmovesmodel.h"
 
@@ -15,8 +16,8 @@ GMoveNode::GMoveNode(const QPersistentModelIndex &index, QGraphicsItem *parent)
       mIndex(index)
 {
     setFlag(ItemIsSelectable);// | QGraphicsItem::ItemIsMovable);
-    setPos(mIndex.data(GraphicsRole::XYRole).toPointF());
-    setZValue(mIndex.data(GraphicsRole::ZRole).toDouble());
+    setPos(mIndex.data(G::MoveXYRole).toPointF());
+    setZValue(mIndex.data(G::MoveZRole).toDouble());
 }
 
 QRectF GMoveNode::boundingRect() const
@@ -26,7 +27,7 @@ QRectF GMoveNode::boundingRect() const
 
 void GMoveNode::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
-    QColor c(mIndex.data(GraphicsRole::SelectionRole).toBool() ? Qt::red : Qt::blue);
+    QColor c(mIndex.data(G::SelectionRole).toBool() ? Qt::red : Qt::blue);
     painter->setBrush(QBrush(c));
     painter->setPen(QPen(Qt::NoPen));
     painter->setRenderHint(QPainter::Antialiasing);

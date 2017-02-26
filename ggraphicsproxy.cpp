@@ -3,6 +3,7 @@
 #include <QPainter>
 #include <QDebug>
 
+#include "g.h"
 #include "gmovesmodel.h"
 #include "gmovenode.h"
 #include "gmoveline.h"
@@ -78,19 +79,19 @@ void GGraphicsProxy::dataChanged(const QModelIndex &topLeft, const QModelIndex &
         if (min == -1) min = 0;
         if (max == -1) max = mModel->rowCount() - 1;
         
-        if (roles.contains(GraphicsRole::VisibilityRole)) {
+        if (roles.contains(G::VisibilityRole)) {
             for (int i = min; i <= max; ++i) {
                 QPersistentModelIndex index = mModel->index(i, 0);
-                bool v = mModel->data(index, GraphicsRole::VisibilityRole).toBool();
+                bool v = mModel->data(index, G::VisibilityRole).toBool();
                 
                 mIndexToNodes.value(index)->setVisible(v);
             }
         }
         
-        if (roles.contains(GraphicsRole::SelectionRole)) {
+        if (roles.contains(G::SelectionRole)) {
             for (int i = min; i <= max; ++i) {
                 QPersistentModelIndex index = mModel->index(i, 0);
-                bool v = mModel->data(index, GraphicsRole::SelectionRole).toBool();
+                bool v = mModel->data(index, G::SelectionRole).toBool();
                 
                 mIndexToNodes.value(index)->setSelected(v);
             }

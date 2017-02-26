@@ -29,7 +29,8 @@ SOURCES += main.cpp\
     gmoveline.cpp \
     gnavigatormodel.cpp \
     gnavigatoritem.cpp \
-    gnavigator.cpp
+    gnavigator.cpp \
+    gfilterproxy.cpp
 
 HEADERS  += mainwindow.h \
     gcode.h \
@@ -47,6 +48,10 @@ HEADERS  += mainwindow.h \
     gmoveline.h \
     gnavigatormodel.h \
     gnavigatoritem.h \
-    gnavigator.h
+    gnavigator.h \
+    gfilterproxy.h \
+    g.h
 
 FORMS    += mainwindow.ui
+
+RESOURCES     = g-pad.qrc

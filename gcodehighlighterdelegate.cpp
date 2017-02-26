@@ -7,6 +7,11 @@
 #include <QApplication>
 #include <QDebug>
 
+GCodeHighlighterDelegate::GCodeHighlighterDelegate(QObject *parent)
+    : QStyledItemDelegate(parent)
+{
+}
+
 void GCodeHighlighterDelegate::paint(QPainter* painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
     QStyleOptionViewItemV4 optionV4 = option;
