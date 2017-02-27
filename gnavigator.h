@@ -5,9 +5,7 @@
 #include <QHash>
 
 #include "gcode.h"
-
-//class GCode;
-class GNavigatorItem;
+#include "gnavigatoritem.h"
 
 class GNavigator : public QObject
 {
@@ -16,17 +14,20 @@ public:
     GNavigator(GCode *data, QObject *parent = 0);
     virtual ~GNavigator();
  
-    enum { 
-        Visible = 0,
-        PartiallyVisible,
-        Invisible
-    };
-    
-    int testVisibility(GNavigatorItem* item);
     
     GNavigatorItem* root() const { return mRootItem; }
 //    GNavigatorItem* parent(GNavigatorItem* child) const;
 //    GNavigatorItem* child(GNavigatorItem* parent) const;
+    
+    Qt::CheckState selected(GNavigatorItem* item) const { return testState(item, mGCode->selection()); }
+    void selectAll() { mGCode->selectAll(); }
+    void deselectAll() { mGCode->deselectAll(); }
+    
+    Qt::CheckState visible(GNavigatorItem* item) const { return testState(item, mGCode->visibility()); }
+    void showAll() { mGCode->showAll(); }
+    void show(GNavigatorItem* item) { mGCode->show(item->firstLine(), item->lastLine()); }
+    void hideAll() { mGCode->hideAll(); }
+    void hide(GNavigatorItem* item) { mGCode->hide(item->firstLine(), item->lastLine()); }
     
 signals:
     void dataChanged(int top, int bottom);
@@ -43,7 +44,7 @@ protected slots:
     
 private:
     void setupModelData();
-    
+    Qt::CheckState testState(GNavigatorItem* item, const QBitArray &state) const;
     
     GCode *mGCode;
     GNavigatorItem *mRootItem;

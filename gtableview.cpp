@@ -4,7 +4,6 @@
 #include "gfilterproxy.h"
 
 #include <QScrollBar>
-#include <QHeaderView>
 #include <QApplication>
 #include <QStyledItemDelegate>
 #include <QDebug>
@@ -58,10 +57,10 @@ void GTableView::setModel(QAbstractItemModel *model)
         
     } else {
         mGProxy= static_cast<GFilterProxy*>(model);
+        mGModel = static_cast<GAbstractTableModel*>(mGProxy->sourceModel());
+        
         connect(mGProxy, SIGNAL(rowsInserted(QModelIndex,int,int)), this, SLOT(scrollToCurrent()));
         connect(mGProxy, SIGNAL(rowsRemoved(QModelIndex,int,int)), this, SLOT(scrollToCurrent()));
-        
-        mGModel = static_cast<GAbstractTableModel*>(mGProxy->sourceModel());
         connect(this, SIGNAL(clicked(QModelIndex)), mGProxy, SLOT(clicked(QModelIndex)));
     }
     
@@ -79,13 +78,7 @@ void GTableView::currentChanged(const QModelIndex &current, const QModelIndex &p
 void GTableView::selectionChanged(const QItemSelection &selected, const QItemSelection &deselected)
 {
     QTableView::selectionChanged(selected, deselected);
-    if (mGProxy) {
-        scrollTo(mGProxy->index(currentIndex().row(), 0), QAbstractItemView::EnsureVisible);
-        scrollTo(mGProxy->index(currentIndex().row(), 0), QAbstractItemView::EnsureVisible); // Do not delete
-        
-    } else {
-        scrollTo(mGModel->index(currentIndex().row(), 0), QAbstractItemView::EnsureVisible);
-    }
+    scrollToCurrent();
 }
 
 void GTableView::scrollToCurrent()
@@ -93,5 +86,7 @@ void GTableView::scrollToCurrent()
     if (mGProxy) {
         scrollTo(mGProxy->index(currentIndex().row(), 0), QAbstractItemView::EnsureVisible);
         scrollTo(mGProxy->index(currentIndex().row(), 0), QAbstractItemView::EnsureVisible); // Do not delete
+    } else {
+        scrollTo(mGModel->index(currentIndex().row(), 0), QAbstractItemView::EnsureVisible);
     }
 }

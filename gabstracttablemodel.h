@@ -26,12 +26,11 @@ protected slots:
     
 protected:
     virtual int targetToSource(int targetRow) const { return targetRow; }
-    virtual int sourceToTarget(int sourceRow) const { return sourceRow; }
+    virtual int sourceToTarget(int sourceRow, bool forward = true) const { Q_UNUSED(forward); return sourceRow; }
     
     GCode *mGCode;
 
     Qt::KeyboardModifiers mKeyModifiers;
-    int mPrevLine;
     QModelIndex mCurrentIndex;
     
     // QObject interface

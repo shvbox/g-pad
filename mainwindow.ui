@@ -269,7 +269,7 @@
       <number>4</number>
      </property>
      <item>
-      <widget class="QTreeView" name="navigatorView">
+      <widget class="GNavigatorView" name="navigatorView">
        <property name="font">
         <font>
          <family>Ubuntu Mono</family>
@@ -338,6 +338,11 @@
    <class>GGraphicsView</class>
    <extends>QGraphicsView</extends>
    <header location="global">ggraphicsview.h</header>
+  </customwidget>
+  <customwidget>
+   <class>GNavigatorView</class>
+   <extends>QTreeView</extends>
+   <header location="global">gnavigatorview.h</header>
   </customwidget>
  </customwidgets>
  <resources>

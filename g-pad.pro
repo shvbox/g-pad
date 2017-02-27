@@ -30,7 +30,8 @@ SOURCES += main.cpp\
     gnavigatormodel.cpp \
     gnavigatoritem.cpp \
     gnavigator.cpp \
-    gfilterproxy.cpp
+    gfilterproxy.cpp \
+    gnavigatorview.cpp
 
 HEADERS  += mainwindow.h \
     gcode.h \
@@ -50,7 +51,8 @@ HEADERS  += mainwindow.h \
     gnavigatoritem.h \
     gnavigator.h \
     gfilterproxy.h \
-    g.h
+    g.h \
+    gnavigatorview.h
 
 FORMS    += mainwindow.ui
 

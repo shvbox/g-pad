@@ -112,7 +112,7 @@ int GMovesModel::targetToSource(int targetRow) const
     return mGCode->moveToLine(targetRow);
 }
 
-int GMovesModel::sourceToTarget(int sourceRow) const
+int GMovesModel::sourceToTarget(int sourceRow, bool forward) const
 {
-    return mGCode->lineToMove(sourceRow);
+    return forward ? mGCode->lineToMoveForward(sourceRow) : mGCode->lineToMoveBackward(sourceRow);
 }

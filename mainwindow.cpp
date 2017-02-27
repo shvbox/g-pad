@@ -121,13 +121,17 @@ void MainWindow::openRecentFile()
 
 void MainWindow::syncMovesViewScroll(int val)
 {
-    int movesVal = mGCode->lineToMove(val, true);
-    ui->movesView->verticalScrollBar()->setValue(movesVal < 0 ? mMovesModel->rowCount() : movesVal);
+    int line = mCodeProxy->mapToSource(mCodeProxy->index(val, 0)).row();
+    int move = mGCode->lineToMoveForward(line);
+    int moveVal = mMovesProxy->mapFromSource(mMovesModel->index(move, 0)).row();
+    ui->movesView->verticalScrollBar()->setValue(moveVal);
 }
 
 void MainWindow::syncCodeViewScroll(int val)
 {
-    int codeVal = mGCode->moveToLine(val);
+    int move = mMovesProxy->mapToSource(mMovesProxy->index(val, 0)).row();
+    int line = mGCode->moveToLine(move);
+    int codeVal = mCodeProxy->mapFromSource(mCodeModel->index(line, 0)).row();
     ui->codeView->verticalScrollBar()->setValue(codeVal);
 }
 

@@ -39,7 +39,7 @@ public:
     
 protected:
     int targetToSource(int targetRow) const;
-    int sourceToTarget(int sourceRow) const;
+    int sourceToTarget(int sourceRow, bool forward = true) const;
 };
 
 #endif // GMOVESMODEL_H

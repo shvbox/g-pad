@@ -18,6 +18,9 @@ public:
     
 public slots:
     
+protected slots:
+    void scrollToCurrent();
+    
 private:
     GAbstractTableModel *mGModel;
     GFilterProxy *mGProxy;
@@ -26,7 +29,6 @@ private:
 protected slots:
     void currentChanged(const QModelIndex &current, const QModelIndex &previous);
     void selectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
-    void scrollToCurrent();
 };
 
 #endif // GTABLEVIEW_H

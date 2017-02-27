@@ -14,8 +14,6 @@
 class GCode : public QObject
 {
     Q_OBJECT
-    friend class GNavigator;
-
 public:
     explicit GCode(QObject *parent = 0);
     ~GCode();
@@ -34,7 +32,9 @@ public:
     QString code(int line) const { return mLines.at(line)->code(); }
 
     // Moves
-    int lineToMove(int line, bool search = false);
+    int lineToMove(int line);
+    int lineToMoveForward(int line);
+    int lineToMoveBackward(int line);
     int moveToLine(int move);
     double X(int move) const;
     double Y(int move) const;
@@ -53,6 +53,7 @@ public:
     
     // Selection
     bool selected(int line) const { return mSelected.at(line); }
+    QBitArray selection() const { return mSelected; }
     void selectAll();
     void select(int line);
     void select(int firstLine, int lastLine);
@@ -64,6 +65,7 @@ public:
     
     // Appearance
     bool visible(int line) const { return mVisible.testBit(line); }
+    QBitArray visibility() const { return mVisible; }
     void showAll();
     void show(int line);
     void show(int firstLine, int lastLine);

@@ -12,8 +12,7 @@
 GAbstractTableModel::GAbstractTableModel(GCode *data, QObject *parent)
     : QAbstractTableModel(parent),
       mGCode(data),
-      mKeyModifiers(Qt::NoModifier),
-      mPrevLine(-1)
+      mKeyModifiers(Qt::NoModifier)
 {
     connect(mGCode, SIGNAL(dataChanged(int, int)), this, SLOT(dataUpdated(int, int)));
     connect(mGCode, SIGNAL(selectionChanged(int,int)), this, SLOT(selectionUpdated(int, int)));
@@ -24,61 +23,65 @@ GAbstractTableModel::GAbstractTableModel(GCode *data, QObject *parent)
 
 void GAbstractTableModel::clicked(const QModelIndex &index)
 {
+    if (!(index.isValid() && index == mCurrentIndex)) return;
+    
     int line = targetToSource(index.row());
     int col = index.column();
 
-    if (line == mPrevLine && index.isValid()) {
-        if (col == LineNumberColumn) {
-            switch (mKeyModifiers) {
-            case Qt::SHIFT: {
-                mGCode->show(line);
-            }
-                break;
-            case Qt::CTRL: {
-                mGCode->hide(line);
-            }
-                break;
-            case Qt::ALT: {
-                mGCode->toggleVisible(line);
-            }
-                break;
-            default:
-                break;
-            }
-            
-        } else {
-            switch (mKeyModifiers) {
-            case Qt::SHIFT: {
-                mGCode->select(line);
-            }
-                break;
-            case Qt::CTRL: {
-                mGCode->deselect(line);
-            }
-                break;
-            case Qt::ALT: {
-                mGCode->toggleSelection(line);
-            }
-                break;
-            default:
-                break;
-            }
+    if (col == LineNumberColumn) {
+        switch (mKeyModifiers) {
+        case Qt::SHIFT: {
+            mGCode->show(line);
         }
-        mKeyModifiers = Qt::NoModifier;
+            break;
+        case Qt::CTRL: {
+            mGCode->hide(line);
+        }
+            break;
+        case Qt::ALT: {
+            mGCode->toggleVisible(line);
+        }
+            break;
+        default:
+            break;
+        }
+        
+    } else {
+        switch (mKeyModifiers) {
+        case Qt::SHIFT: {
+            mGCode->select(line);
+        }
+            break;
+        case Qt::CTRL: {
+            mGCode->deselect(line);
+        }
+            break;
+        case Qt::ALT: {
+            mGCode->toggleSelection(line);
+        }
+            break;
+        default:
+            break;
+        }
     }
+    mKeyModifiers = Qt::NoModifier;
 }
 
 void GAbstractTableModel::currentChanged(const QModelIndex &current)
 {
-    int line = targetToSource(current.row());
-    mCurrentIndex = current;
+    if (!current.isValid()) return;
     
-    if (mPrevLine >= 0 && current.isValid()) {
+    if (!mCurrentIndex.isValid()) {
+        mCurrentIndex = current;
+        mKeyModifiers = Qt::NoModifier;
+        
+    } else {
         // Prevent recursion
-        int prevLine = mPrevLine;
+        int line = targetToSource(current.row());
+        int prevLine = targetToSource(mCurrentIndex.row());
         Qt::KeyboardModifiers keyModifiers = mKeyModifiers;
                 
-        mPrevLine = line;
+        mCurrentIndex = current;
         mKeyModifiers = Qt::NoModifier;
         
         int col = current.column();
@@ -113,7 +116,7 @@ void GAbstractTableModel::currentChanged(const QModelIndex &current)
                 break;
                 
             case Qt::CTRL: {
-                qDebug() << __PRETTY_FUNCTION__ << prevLine << line;
+//                qDebug() << __PRETTY_FUNCTION__ << prevLine << line;
                 mGCode->deselect(prevLine, line);
             }
                 break;
@@ -127,16 +130,12 @@ void GAbstractTableModel::currentChanged(const QModelIndex &current)
                 break;
             }
         }
-        
-    } else {
-        mPrevLine = line;
-        mKeyModifiers = Qt::NoModifier;
     }
 }
 
 void GAbstractTableModel::dataUpdated(int top, int bottom)
 {
-    emit dataChanged(index(sourceToTarget(top), 0), index(sourceToTarget(bottom), columnCount() - 1));
+    emit dataChanged(index(sourceToTarget(top), 0), index(sourceToTarget(bottom, false), columnCount() - 1));
 }
 
 void GAbstractTableModel::selectionUpdated(int top, int bottom)
@@ -148,7 +147,7 @@ void GAbstractTableModel::selectionUpdated(int top, int bottom)
           << Qt::BackgroundRole
           << Qt::TextAlignmentRole;
     
-    emit dataChanged(index(sourceToTarget(top), LineNumberColumn + 1), index(sourceToTarget(bottom), columnCount() - 1), roles);
+    emit dataChanged(index(sourceToTarget(top), LineNumberColumn + 1), index(sourceToTarget(bottom, false), columnCount() - 1), roles);
 }
 
 void GAbstractTableModel::visibilityUpdated(int top, int bottom)
@@ -160,7 +159,7 @@ void GAbstractTableModel::visibilityUpdated(int top, int bottom)
           << Qt::BackgroundRole
           << Qt::TextAlignmentRole;
     
-    emit dataChanged(index(sourceToTarget(top), LineNumberColumn), index(sourceToTarget(bottom), LineNumberColumn), roles);
+    emit dataChanged(index(sourceToTarget(top), LineNumberColumn), index(sourceToTarget(bottom, false), LineNumberColumn), roles);
 }
 
 void GAbstractTableModel::beginResetData()
@@ -171,7 +170,6 @@ void GAbstractTableModel::beginResetData()
 void GAbstractTableModel::endResetData()
 {
     mKeyModifiers = Qt::NoModifier;
-    mPrevLine = -1;
     mCurrentIndex = QModelIndex();
     endResetModel();
 }
@@ -200,12 +198,6 @@ bool GAbstractTableModel::eventFilter(QObject */*obj*/, QEvent *event)
             } else {
                 mGCode->deselectAll();
             }
-            
-        } else if (seq == QKeySequence(Qt::ALT + Qt::Key_A)) {
-            mGCode->showAll();
-            
-        } else if (seq == QKeySequence(Qt::ALT + Qt::SHIFT + Qt::Key_A)) {
-            mGCode->hideAll();
         }
     }
     

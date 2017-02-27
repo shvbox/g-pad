@@ -100,20 +100,38 @@ bool GCode::read(const QString &fileName)
     return true;
 }
 
-int GCode::lineToMove(int line, bool search)
+int GCode::lineToMove(int line)
 {
     if (line < 0 || line >= mLMMap.size()) {
         return -1;
     }
-    int m = mLMMap.at(line);
-    if (m >= 0 || !search) {
-        return m;
+    return mLMMap.at(line);
+}
+
+int GCode::lineToMoveForward(int line)
+{
+    if (line < 0 || line >= mLMMap.size()) {
+        return -1;
     }
-    
+
+    int m = mLMMap.at(line++);
     while (m < 0 && line < mLMMap.size()) {
         m = mLMMap.at(line++);
     }
-    return m;
+    return m < 0 ? mMoves.size() - 1 : m;
+}
+
+int GCode::lineToMoveBackward(int line)
+{
+    if (line < 0 || line >= mLMMap.size()) {
+        return -1;
+    }
+
+    int m = mLMMap.at(line--);
+    while (m < 0 && line >= 0) {
+        m = mLMMap.at(line--);
+    }
+    return (m < 0 && !mMoves.isEmpty()) ? 0 : m;
 }
 
 int GCode::moveToLine(int move)
@@ -228,7 +246,7 @@ void GCode::select(int firstLine, int lastLine)
     }
     
     if (changed) {
-        emit selectionChanged(firstLine, lastLine);
+        emit selectionChanged(min, max);
     }
 }
 
@@ -261,7 +279,7 @@ void GCode::deselect(int firstLine, int lastLine)
     }
     
     if (changed) {
-        emit selectionChanged(firstLine, lastLine);
+        emit selectionChanged(min, max);
     }
 }
 
@@ -289,7 +307,7 @@ void GCode::toggleSelection(int firstLine, int lastLine)
         }
     }
     
-    emit selectionChanged(firstLine, lastLine);
+    emit selectionChanged(min, max);
 }
 
 void GCode::showAll()
@@ -320,7 +338,7 @@ void GCode::show(int firstLine, int lastLine)
     }
     
     if (changed) {
-        emit visibilityChanged(firstLine, lastLine);
+        emit visibilityChanged(min, max);
     }
 }
 
@@ -357,7 +375,7 @@ void GCode::hide(int firstLine, int lastLine)
     if (changed) {
 //        qDebug() << __PRETTY_FUNCTION__ << firstLine << lastLine;
         deselect(firstLine, lastLine);
-        emit visibilityChanged(firstLine, lastLine);
+        emit visibilityChanged(min, max);
 //        qDebug() << __PRETTY_FUNCTION__ << "!" << firstLine << lastLine;
     }
 }
@@ -392,6 +410,6 @@ void GCode::toggleVisible(int firstLine, int lastLine)
         deselect(firstLine, lastLine);
     }
     
-    emit visibilityChanged(firstLine, lastLine);
+    emit visibilityChanged(min, max);
 }
 

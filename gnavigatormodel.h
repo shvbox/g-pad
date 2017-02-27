@@ -31,10 +31,13 @@ protected slots:
     void endResetData();
     
 private:
-//    void setupModelData();
-    
     GNavigator *mNavigator;
-//    GNavigatorItem *mRootItem;
+    Qt::KeyboardModifiers mKeyModifiers;
+    QModelIndex mCurrentIndex;
+    
+    // QObject interface
+public:
+    bool eventFilter(QObject *obj, QEvent *event);
     
     // QAbstractItemModel interface
 public:

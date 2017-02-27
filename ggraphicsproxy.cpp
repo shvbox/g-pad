@@ -72,14 +72,12 @@ void GGraphicsProxy::rowsAboutToBeRemoved(const QModelIndex &parent, int start, 
 
 void GGraphicsProxy::dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles)
 {
-//    qDebug() << __PRETTY_FUNCTION__;
     if (!roles.empty()) {
-        int min = qMin(topLeft.row(), bottomRight.row());
-        int max = qMax(topLeft.row(), bottomRight.row());
-        if (min == -1) min = 0;
-        if (max == -1) max = mModel->rowCount() - 1;
+        int min = topLeft.row() == -1 ? 0 : qMin(topLeft.row(), bottomRight.row());
+        int max = bottomRight.row() == -1 ? mModel->rowCount() - 1 : qMax(topLeft.row(), bottomRight.row());
         
         if (roles.contains(G::VisibilityRole)) {
+//            qDebug() << __PRETTY_FUNCTION__ << "VisibilityRole" << min << max;
             for (int i = min; i <= max; ++i) {
                 QPersistentModelIndex index = mModel->index(i, 0);
                 bool v = mModel->data(index, G::VisibilityRole).toBool();
@@ -89,6 +87,7 @@ void GGraphicsProxy::dataChanged(const QModelIndex &topLeft, const QModelIndex &
         }
         
         if (roles.contains(G::SelectionRole)) {
+//            qDebug() << __PRETTY_FUNCTION__ << "SelectionRole";
             for (int i = min; i <= max; ++i) {
                 QPersistentModelIndex index = mModel->index(i, 0);
                 bool v = mModel->data(index, G::SelectionRole).toBool();

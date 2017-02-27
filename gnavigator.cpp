@@ -1,7 +1,6 @@
 #include "gnavigator.h"
 
 #include <QDebug>
-#include "gnavigatoritem.h"
 
 GNavigator::GNavigator(GCode *data, QObject *parent) 
     : QObject(parent),
@@ -20,25 +19,6 @@ GNavigator::GNavigator(GCode *data, QObject *parent)
 GNavigator::~GNavigator()
 {
     delete mRootItem;
-}
-
-int GNavigator::testVisibility(GNavigatorItem *item)
-{
-    QBitArray ba(mGCode->mVisible);
-    ba.fill(true, item->firstLine(), item->lastLine() + 1);
-    ba ^= mGCode->mVisible;
-    
-    int cnt = ba.count(true);
-    if (cnt == 0) {
-        return Visible;
-    }
-    
-    int len = item->lastLine() - item->firstLine() + 1;
-    if (cnt == len) {
-        return Invisible;
-    }
-    
-    return PartiallyVisible;
 }
 
 //GNavigatorItem *GNavigator::parent(GNavigatorItem *child) const
@@ -74,7 +54,8 @@ void GNavigator::setupModelData()
 //    GNavigatorItem *zChild = NULL;
     int firstLine = 0;
 
-    for (int line = 0; line < mGCode->linesCount(); ++line) {
+    int line = 0;
+    for (line = 0; line < mGCode->linesCount(); ++line) {
         int move = mGCode->lineToMove(line);
         if (move > 0) {
             double z = mGCode->Z(move);
@@ -96,5 +77,39 @@ void GNavigator::setupModelData()
             }
         }
     }
+    
+    if (line > 0 && line == mGCode->linesCount()) {
+        QList<QVariant> data1;
+        data1 << (QString("Z = %1").arg(zp)) << mGCode->line(firstLine);
+        GNavigatorItem *zChild = new GNavigatorItem(firstLine, line - 1, data1, mRootItem);
+        mRootItem->appendChild(zChild);
+        
+        for (int j = 0; j < 2; ++j) {
+            QList<QVariant> data2;
+            data2 << (j + 1) << ("test" + j);
+            
+            GNavigatorItem *child2 = new GNavigatorItem(j, j, data2, zChild);
+            zChild->appendChild(child2);
+        }
+    }
+}
+
+Qt::CheckState GNavigator::testState(GNavigatorItem *item, const QBitArray &state) const
+{
+    QBitArray ba(state);
+    ba.fill(true, item->firstLine(), item->lastLine() + 1);
+    ba ^= state;
+    
+    int cnt = ba.count(true);
+    if (cnt == 0) {
+        return Qt::Checked;
+    }
+    
+    int len = item->lastLine() - item->firstLine() + 1;
+    if (cnt == len) {
+        return Qt::Unchecked;
+    }
+    
+    return Qt::PartiallyChecked;
 }
 
