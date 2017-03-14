@@ -67,6 +67,10 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->actionFilter, SIGNAL(triggered(bool)), mMovesProxy, SLOT(toggleFilter(bool)));
     connect(mCodeModel, SIGNAL(modelReset()), this, SLOT(resizeTableColumns()));
     
+    // Setup synchronous scrolling
+    connect(ui->codeView->verticalScrollBar(), SIGNAL(valueChanged(int)), this, SLOT(syncMovesViewScroll(int)));
+    connect(ui->movesView->verticalScrollBar(), SIGNAL(valueChanged(int)), this, SLOT(syncCodeViewScroll(int)));
+
     ui->actionFilter->trigger();
 }
 
@@ -178,21 +182,10 @@ bool MainWindow::maybeSave()
 
 void MainWindow::resizeTableColumns()
 {
-    // Setup unsynchronous scrolling
-    disconnect(ui->codeView->verticalScrollBar(), SIGNAL(valueChanged(int)), this, SLOT(syncMovesViewScroll(int)));
-    disconnect(ui->movesView->verticalScrollBar(), SIGNAL(valueChanged(int)), this, SLOT(syncCodeViewScroll(int)));
-
-    // Resize columns
-    ui->codeView->scrollToBottom();
     ui->codeView->resizeColumnToContents(GCodeModel::LineNumberColumn);
     ui->codeView->resizeColumnToContents(GCodeModel::GCodeLineColumn);
-    ui->codeView->scrollToTop();
     
     ui->movesView->resizeColumnToContents(GMovesModel::LineNumberColumn);
-    
-    // Setup synchronous scrolling
-    connect(ui->codeView->verticalScrollBar(), SIGNAL(valueChanged(int)), this, SLOT(syncMovesViewScroll(int)));
-    connect(ui->movesView->verticalScrollBar(), SIGNAL(valueChanged(int)), this, SLOT(syncCodeViewScroll(int)));
 }
 
 void MainWindow::readSettings()

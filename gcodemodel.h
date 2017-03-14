@@ -23,7 +23,17 @@ public:
 signals:
     
 public slots:
-
+    
+private:
+    QString mLongestLine;
+    
+    // QAbstractItemModel interface
+public:
+    QVariant headerData(int section, Qt::Orientation orientation, int role) const;
+    
+    // GAbstractTableModel interface
+protected slots:
+    void endResetData();
 };
 
 #endif // GCODEMODEL_H

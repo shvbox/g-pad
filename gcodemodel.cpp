@@ -43,4 +43,33 @@ Qt::ItemFlags GCodeModel::flags(const QModelIndex &index) const
     //    return QAbstractTableModel::flags(index) | (index.column() == 1 ? Qt::ItemIsEditable : Qt::NoItemFlags);
 }
 
+QVariant GCodeModel::headerData(int section, Qt::Orientation orientation, int role) const
+{
+    if (role == Qt::DisplayRole) {
+        if (orientation == Qt::Horizontal) {
+            if (section == GCodeLineColumn) {
+                return mLongestLine;
+            }
+        }
+    }
+    
+    return GAbstractTableModel::headerData(section, orientation, role);
+}
 
+
+void GCodeModel::endResetData()
+{
+    mLongestLine = QString();
+    int maxLen = mLongestLine.length();
+    for (int i = 0; i < mGCode->linesCount(); ++i) {
+        QString line = mGCode->line(i);
+        if (line.length() > maxLen) {
+            mLongestLine = line;
+            maxLen = mLongestLine.length();
+        }
+    }
+    
+    mLongestLine += "1234567890";
+    
+    GAbstractTableModel::endResetData();
+}

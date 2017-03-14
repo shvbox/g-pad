@@ -45,6 +45,7 @@ void GGraphicsProxy::resetData()
     for (int i = 0; i < mModel->rowCount(); ++i) {
         QPersistentModelIndex index = mModel->index(i, 0);
         GMoveNode* node = new GMoveNode(index);
+        node->setVisible(index.data(G::VisibilityRole).toBool());
 
         addItem(node);
         addItem(new GMoveLine(prevNode, node));
@@ -72,17 +73,15 @@ void GGraphicsProxy::rowsAboutToBeRemoved(const QModelIndex &parent, int start, 
 
 void GGraphicsProxy::dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles)
 {
-    if (!roles.empty()) {
+    if (!(roles.empty() || mIndexToNodes.isEmpty())) {
         int min = topLeft.row() == -1 ? 0 : qMin(topLeft.row(), bottomRight.row());
         int max = bottomRight.row() == -1 ? mModel->rowCount() - 1 : qMax(topLeft.row(), bottomRight.row());
         
         if (roles.contains(G::VisibilityRole)) {
-//            qDebug() << __PRETTY_FUNCTION__ << "VisibilityRole" << min << max;
+            //qDebug() << __PRETTY_FUNCTION__ << "VisibilityRole" << min << max;
             for (int i = min; i <= max; ++i) {
                 QPersistentModelIndex index = mModel->index(i, 0);
-                bool v = mModel->data(index, G::VisibilityRole).toBool();
-                
-                mIndexToNodes.value(index)->setVisible(v);
+                mIndexToNodes.value(index)->setVisible(index.data(G::VisibilityRole).toBool());
             }
         }
         

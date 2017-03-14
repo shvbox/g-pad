@@ -152,6 +152,7 @@ void GAbstractTableModel::selectionUpdated(int top, int bottom)
 
 void GAbstractTableModel::visibilityUpdated(int top, int bottom)
 {
+    //qDebug() << __PRETTY_FUNCTION__;
     QVector<int> roles;
     roles << G::VisibilityRole
           << Qt::FontRole

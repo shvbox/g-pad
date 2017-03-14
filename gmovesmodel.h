@@ -14,10 +14,16 @@ public:
            YColumn,
            ZColumn, 
            EColumn, 
-           FColumn,
-           distColumn,
+           EEffectiveColumn, 
+           ETotalColumn, 
            dEColumn,
-           flowColumn
+           DistanceColumn,
+           FlowColumn,
+           FColumn,
+           FEffectiveColumn,
+           BedColumn,
+           ExtruderColumn,
+           FanColumn
          };
     
 signals:

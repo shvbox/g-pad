@@ -17,7 +17,7 @@ int GMovesModel::rowCount(const QModelIndex &) const
 
 int GMovesModel::columnCount(const QModelIndex &) const
 {
-    return 10;
+    return 16;
 }
 
 QVariant GMovesModel::data(const QModelIndex &index, int role) const
@@ -44,21 +44,33 @@ QVariant GMovesModel::data(const QModelIndex &index, int role) const
         case CodeColumn:
             return mGCode->code(line);
         case XColumn:
-            return mGCode->X(move);
+            return QString::number(mGCode->X(move));
         case YColumn:
-            return mGCode->Y(move);
+            return QString::number(mGCode->Y(move));
         case ZColumn:
-            return mGCode->Z(move);
+            return QString::number(mGCode->Z(move));
         case EColumn:
-            return mGCode->E(move);
+            return QString::number(mGCode->E(move));
+        case EEffectiveColumn:
+            return QString::number(mGCode->EE(move));
+        case ETotalColumn:
+            return QString::number(mGCode->ET(move),'f', 4);
         case FColumn:
-            return mGCode->F(move);
-        case distColumn:
-            return mGCode->distance(move);
+            return QString::number(mGCode->F(move));
+        case FEffectiveColumn:
+            return QString::number(mGCode->FE(move));
+        case DistanceColumn:
+            return QString::number(mGCode->distance(move));
         case dEColumn:
-            return mGCode->deltaE(move);
-        case flowColumn:
-            return mGCode->flow(move);
+            return QString::number(mGCode->dEE(move));
+        case FlowColumn:
+            return QString::number(mGCode->flow(move));
+        case BedColumn:
+            return QString::number(mGCode->bedT(move));
+        case ExtruderColumn:
+            return QString::number(mGCode->extT(move));
+        case FanColumn:
+            return QString::number(mGCode->fanSpeed(move),'f', 1);
         default:
             break;
         }
@@ -84,14 +96,26 @@ QVariant GMovesModel::headerData(int section, Qt::Orientation orientation, int r
                 return QString("Z");
             case EColumn:
                 return QString("E");
+            case EEffectiveColumn:
+                return QString(tr("E\'"));
+            case ETotalColumn:
+                return QString(tr("ΣE\'"));
             case FColumn:
                 return QString("F");
-            case distColumn:
-                return QString("l");
+            case FEffectiveColumn:
+                return QString(tr("F\'"));
+            case DistanceColumn:
+                return QString(tr("dist."));
             case dEColumn:
-                return QString("dE");
-            case flowColumn:
-                return QString("f");
+                return QString(tr("ΔE\'"));
+            case FlowColumn:
+                return QString(tr("flow\'"));
+            case BedColumn:
+                return QString(tr("bed t°"));
+            case ExtruderColumn:
+                return QString(tr("ext. t°"));
+            case FanColumn:
+                return QString(tr("fan %"));
             default:
                 break;
             }

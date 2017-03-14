@@ -1,9 +1,3 @@
-#-------------------------------------------------
-#
-# Project created by QtCreator 2017-01-03T17:39:33
-#
-#-------------------------------------------------
-
 QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
@@ -14,11 +8,8 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    gcode.cpp \
     gcodehighlighter.cpp \
-    gline.cpp \
     gmovesmodel.cpp \
-    gmove.cpp \
     gabstracttablemodel.cpp \
     gtableview.cpp \
     gcodemodel.cpp \
@@ -34,11 +25,8 @@ SOURCES += main.cpp\
     gnavigatorview.cpp
 
 HEADERS  += mainwindow.h \
-    gcode.h \
     gcodehighlighter.h \
-    gline.h \
     gmovesmodel.h \
-    gmove.h \
     gabstracttablemodel.h \
     gtableview.h \
     gcodemodel.h \
@@ -57,3 +45,18 @@ HEADERS  += mainwindow.h \
 FORMS    += mainwindow.ui
 
 RESOURCES     = g-pad.qrc
+
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../gcodelib/build-gcodelib-Desktop_Qt_5_5_1_GCC_64bit-Release/ -lgcodelib
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../gcodelib/build-gcodelib-Desktop_Qt_5_5_1_GCC_64bit-Debug -lgcodelib
+else:unix:CONFIG(release, debug|release): LIBS += -L$$PWD/../../gcodelib/build-gcodelib-Desktop_Qt_5_5_1_GCC_64bit-Release/ -lgcodelib
+else:unix:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../gcodelib/build-gcodelib-Desktop_Qt_5_5_1_GCC_64bit-Debug/ -lgcodelib
+
+INCLUDEPATH += $$PWD/../../gcodelib
+DEPENDPATH += $$PWD/../../gcodelib
+
+win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../../gcodelib/build-gcodelib-Desktop_Qt_5_5_1_GCC_64bit-Debug/release/libgcodelib.a
+else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../../gcodelib/build-gcodelib-Desktop_Qt_5_5_1_GCC_64bit-Debug/debug/libgcodelib.a
+else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../../gcodelib/build-gcodelib-Desktop_Qt_5_5_1_GCC_64bit-Debug/release/gcodelib.lib
+else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../../gcodelib/build-gcodelib-Desktop_Qt_5_5_1_GCC_64bit-Debug/debug/gcodelib.lib
+else:unix:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../../gcodelib/build-gcodelib-Desktop_Qt_5_5_1_GCC_64bit-Release/libgcodelib.a
+else:unix:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../../gcodelib/build-gcodelib-Desktop_Qt_5_5_1_GCC_64bit-Debug/libgcodelib.a

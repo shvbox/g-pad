@@ -25,8 +25,9 @@ GNavigatorModel::~GNavigatorModel()
 
 void GNavigatorModel::clicked(const QModelIndex &index)
 {
-//    qDebug() << __PRETTY_FUNCTION__ << index.isValid() << (index.parent() == QModelIndex());
-    if (!(index.isValid() && index == mCurrentIndex && index.parent() == QModelIndex())) return;
+    qDebug() << __PRETTY_FUNCTION__ << index.isValid() << (index.parent() == QModelIndex());
+//    if (!(index.isValid() && index == mCurrentIndex && index.parent() == QModelIndex())) return;
+    if (!(index.isValid() && index == mCurrentIndex)) return;
     
     GNavigatorItem *item = static_cast<GNavigatorItem*>(index.internalPointer());
     int col = index.column();
@@ -42,7 +43,7 @@ void GNavigatorModel::clicked(const QModelIndex &index)
         }
             break;
         case Qt::ALT: {
-//                mNavigator->toggleVisible(line);
+            mNavigator->toggleVisible(item);
         }
             break;
         default:
@@ -52,15 +53,15 @@ void GNavigatorModel::clicked(const QModelIndex &index)
     } else {
         switch (mKeyModifiers) {
         case Qt::SHIFT: {
-//                mGCode->select(line);
+                mNavigator->select(item);
         }
             break;
         case Qt::CTRL: {
-//                mGCode->deselect(line);
+                mNavigator->deselect(item);
         }
             break;
         case Qt::ALT: {
-//                mGCode->toggleSelection(line);
+                mNavigator->toggleSelection(item);
         }
             break;
         default:
@@ -72,67 +73,69 @@ void GNavigatorModel::clicked(const QModelIndex &index)
 
 void GNavigatorModel::currentChanged(const QModelIndex &current)
 {
+    qDebug() << __PRETTY_FUNCTION__ << current.row();
     if (!current.isValid()) return;
     
-    if (!mCurrentIndex.isValid()) {
+    if (!mCurrentIndex.isValid() || current.parent() != mCurrentIndex.parent()) {
         mCurrentIndex = current;
         mKeyModifiers = Qt::NoModifier;
         
     } else {
-//        // Prevent recursion
-//        int line = targetToSource(current.row());
-//        int prevLine = targetToSource(mCurrentIndex.row());
-//        Qt::KeyboardModifiers keyModifiers = mKeyModifiers;
-                
+        // Prevent recursion
+        GNavigatorItem *item = static_cast<GNavigatorItem*>(current.internalPointer());
+        GNavigatorItem *prevItem = static_cast<GNavigatorItem*>(mCurrentIndex.internalPointer());
+        Qt::KeyboardModifiers keyModifiers = mKeyModifiers;
+        
         mCurrentIndex = current;
         mKeyModifiers = Qt::NoModifier;
         
-//        int col = current.column();
+        int col = current.column();
         
-//        if (col == LineNumberColumn) {
-//            switch (keyModifiers) {
-//            case Qt::SHIFT: {
-//                mGCode->show(prevLine, line);
-//            }
-//                break;
+        if (col == LineNumberColumn) {
+            switch (keyModifiers) {
+            case Qt::SHIFT: {
+//                qDebug() << __PRETTY_FUNCTION__ << prevLine << line;
+                mNavigator->show(prevItem, item);
+            }
+                break;
                 
-//            case Qt::CTRL: {
-////                qDebug() << __PRETTY_FUNCTION__ << prevLine << line;
-//                mGCode->hide(prevLine, line);
-//            }
-//                break;
+            case Qt::CTRL: {
+//                qDebug() << __PRETTY_FUNCTION__ << prevLine << line;
+                mNavigator->hide(prevItem, item);
+            }
+                break;
                 
-//            case Qt::ALT: {
-//                mGCode->toggleVisible(prevLine, line);
-//            }
-//                break;
+            case Qt::ALT: {
+                mNavigator->toggleVisible(prevItem, item);
+            }
+                break;
                 
-//            default:
-//                break;
-//            }
+            default:
+                break;
+            }
             
-//        } else {
-//            switch (keyModifiers) {
-//            case Qt::SHIFT: {
-//                mGCode->select(prevLine, line);
-//            }
-//                break;
+        } else {
+            switch (keyModifiers) {
+            case Qt::SHIFT: {
+                mNavigator->select(prevItem, item);
+            }
+                break;
                 
-//            case Qt::CTRL: {
-////                qDebug() << __PRETTY_FUNCTION__ << prevLine << line;
-//                mGCode->deselect(prevLine, line);
-//            }
-//                break;
+            case Qt::CTRL: {
+//                qDebug() << __PRETTY_FUNCTION__ << prevLine << line;
+                mNavigator->deselect(prevItem, item);
+            }
+                break;
                 
-//            case Qt::ALT: {
-//                mGCode->toggleSelection(prevLine, line);
-//            }
-//                break;
+            case Qt::ALT: {
+                mNavigator->toggleSelection(prevItem, item);
+            }
+                break;
                 
-//            default:
-//                break;
-//            }
-//        }
+            default:
+                break;
+            }
+        }
     }
 }
 
@@ -167,14 +170,44 @@ QVariant GNavigatorModel::data(const QModelIndex &index, int role) const
     GNavigatorItem *item = static_cast<GNavigatorItem*>(index.internalPointer());
     int line = item->firstLine();
     int col = index.column();
+    GNavigatorItem::ItemType type = item->type();
     
     switch(role){
-    case Qt::DisplayRole:
+    case Qt::DisplayRole: {
         if (col == LineNumberColumn) {
             return (QString("%1").arg(line + 1));
+            
         } else {
-            return item->data(index.column() - 1);
+            GNavigatorItemInfo info = item->info();
+            
+            if (col == InfoColumn){
+                switch (type) {
+                case GNavigatorItem::Layer:
+                    return QString("z=%1").arg(info.z);
+                    
+                case GNavigatorItem::Route:
+                    return QString("l=%1").arg(info.l);
+                    
+                default:
+                    break;
+                }
+                
+            } else if (col == CommentsColumn){
+                switch (type) {
+                case GNavigatorItem::Layer:
+                    return QString("l=%1, lₑ=%2, ΔE'=%3").arg(info.l).arg(info.lE).arg(info.dE);
+                    
+                case GNavigatorItem::Route:
+                    return QString("lₑ=%1, ΔE'=%2").arg(info.lE).arg(info.dE);
+                    
+                default:
+                    break;
+                }
+            }
         }
+        
+        return item->data(col - 1);
+    }
         break;
         
     case Qt::FontRole:
@@ -238,6 +271,24 @@ QVariant GNavigatorModel::data(const QModelIndex &index, int role) const
     }
 
     return QVariant();//item->data(index.column());
+}
+
+QVariant GNavigatorModel::headerData(int section, Qt::Orientation orientation, int role) const
+{
+    if (orientation == Qt::Horizontal && role == Qt::DisplayRole) {
+        switch (section) {
+            case InfoColumn:
+                return tr("Info");
+                
+            case CommentsColumn:
+                return tr("Comments");
+                
+            default:
+                return QVariant();
+        }
+    }
+
+    return QVariant();
 }
 
 Qt::ItemFlags GNavigatorModel::flags(const QModelIndex &index) const
@@ -328,6 +379,7 @@ void GNavigatorModel::beginResetData()
 void GNavigatorModel::endResetData()
 {
 //    qDebug() << __PRETTY_FUNCTION__;
+    mCurrentIndex = QModelIndex();
     endResetModel();
 }
 
@@ -359,3 +411,4 @@ bool GNavigatorModel::eventFilter(QObject */*obj*/, QEvent *event)
     
     return false;
 }
+

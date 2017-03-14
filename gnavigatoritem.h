@@ -4,17 +4,43 @@
 #include <QList>
 #include <QVariant>
 
+struct GNavigatorItemInfo {
+    GNavigatorItemInfo(double z = 0.0, double l = 0.0, double lE = 0.0, double dE = 0.0) 
+        : z(z), l(l), lE(lE), dE(dE) {}
+    double z;  // z value
+    double l;  // distance
+    double lE; // distance with extrusion
+    double dE; // extrusion length
+};
+
 class GNavigatorItem
 {
-//    friend class 
 public:
-    explicit GNavigatorItem(int firstLine, int lastLine, const QList<QVariant> &data, GNavigatorItem *parentItem = 0);
+    enum ItemType {
+        Invalid = 0x0,
+        Root = 0x1,
+        Layer = 0x2,
+        Comment = 0x4,
+        Command = 0x8,
+        Route = 0x10
+    };
+    
+    GNavigatorItem(int firstLine, int lastLine, const QList<QVariant> &data, GNavigatorItem *parent = 0);
+    GNavigatorItem(int firstLine, GNavigatorItem *parent = 0);
     ~GNavigatorItem();
 
+    bool setLastLine(int lastLine);
+    void setInfo(const GNavigatorItemInfo &info);
+    void setData(const QList<QVariant> &data);
+    void appendData(const QVariant &dataItem);
+    
     void appendChild(GNavigatorItem *child);
 
     GNavigatorItem *parentItem();
     GNavigatorItem *child(int row);
+    
+    ItemType type() const { return mType; }
+    void setType(ItemType type);
     
     int firstLine() const { return mFirstLine; }
     int lastLine() const { return mLastLine; }
@@ -22,14 +48,21 @@ public:
     int row() const;
     int childCount() const;
     
-    int columnCount() const;
-    QVariant data(int column) const;
+    GNavigatorItemInfo info() const { return mInfo; }
+    int dataSize() const;
+    QVariant data(int i) const;
+    
+    bool operator==(const GNavigatorItem &v) const { return mFirstLine == v.mFirstLine && mLastLine == v.mLastLine; }
+    bool operator!=(const GNavigatorItem &v) const { return !(*this == v); }
 
 private:
     GNavigatorItem *mParentItem;
     QList<GNavigatorItem*> mChildItems;
     
-    QList<QVariant> mItemData;
+    ItemType mType;
+    
+    GNavigatorItemInfo mInfo;
+    QList<QVariant> mData;
     
     int mFirstLine;
     int mLastLine;
