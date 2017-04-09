@@ -63,6 +63,7 @@ MainWindow::MainWindow(QWidget *parent) :
     }
     
     connect(ui->actionOpen, SIGNAL(triggered()), this, SLOT(openFile()));
+    connect(ui->actionReload, SIGNAL(triggered()), this, SLOT(reloadFile()));
     connect(ui->actionFilter, SIGNAL(triggered(bool)), mCodeProxy, SLOT(toggleFilter(bool)));
     connect(ui->actionFilter, SIGNAL(triggered(bool)), mMovesProxy, SLOT(toggleFilter(bool)));
     connect(mCodeModel, SIGNAL(modelReset()), this, SLOT(resizeTableColumns()));
@@ -95,12 +96,21 @@ void MainWindow::openFile(const QString &path)
     QString fileName = path;
 
     if (fileName.isNull()) {
+        // TODO: mayBeSave()
         fileName = QFileDialog::getOpenFileName(this,
-            tr("Open G-Code"), "", tr("G-Code Files (*.gcode)"));
+            tr("Open G-Code"), mostRecentPath(), tr("G-Code Files (*.gcode)"));
     }
 
     if (!fileName.isEmpty()) {
         loadFile(fileName);
+    }
+}
+
+void MainWindow::reloadFile()
+{
+    if (!mCurrentFileName.isEmpty()) {
+        // TODO: mayBeSave()
+        loadFile(mCurrentFileName);
     }
 }
 
@@ -242,6 +252,8 @@ void MainWindow::setCurrentFile(const QString &fileName)
             mainWin->updateRecentFileActions();
         }
     }
+    
+    mCurrentFileName = fileName;
 }
 
 void MainWindow::updateRecentFileActions()
@@ -267,6 +279,17 @@ void MainWindow::updateRecentFileActions()
 QString MainWindow::strippedName(const QString &fullFileName)
 {
     return QFileInfo(fullFileName).fileName();
+}
+
+QString MainWindow::mostRecentPath()
+{
+    QSettings s;
+    QStringList files = s.value("recentFileList").toStringList();
+    QString path;
+    if (files.size() > 0) {
+        path = QFileInfo(files.at(0)).absolutePath();
+    }
+    return path;
 }
 
 bool MainWindow::eventFilter(QObject */*obj*/, QEvent */*event*/)

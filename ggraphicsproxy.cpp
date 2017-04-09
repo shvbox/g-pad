@@ -3,7 +3,7 @@
 #include <QPainter>
 #include <QDebug>
 
-#include "g.h"
+#include "gpad.h"
 #include "gmovesmodel.h"
 #include "gmovenode.h"
 #include "gmoveline.h"
@@ -45,7 +45,7 @@ void GGraphicsProxy::resetData()
     for (int i = 0; i < mModel->rowCount(); ++i) {
         QPersistentModelIndex index = mModel->index(i, 0);
         GMoveNode* node = new GMoveNode(index);
-        node->setVisible(index.data(G::VisibilityRole).toBool());
+        node->setVisible(index.data(GPad::VisibilityRole).toBool());
 
         addItem(node);
         addItem(new GMoveLine(prevNode, node));
@@ -77,19 +77,19 @@ void GGraphicsProxy::dataChanged(const QModelIndex &topLeft, const QModelIndex &
         int min = topLeft.row() == -1 ? 0 : qMin(topLeft.row(), bottomRight.row());
         int max = bottomRight.row() == -1 ? mModel->rowCount() - 1 : qMax(topLeft.row(), bottomRight.row());
         
-        if (roles.contains(G::VisibilityRole)) {
+        if (roles.contains(GPad::VisibilityRole)) {
             //qDebug() << __PRETTY_FUNCTION__ << "VisibilityRole" << min << max;
             for (int i = min; i <= max; ++i) {
                 QPersistentModelIndex index = mModel->index(i, 0);
-                mIndexToNodes.value(index)->setVisible(index.data(G::VisibilityRole).toBool());
+                mIndexToNodes.value(index)->setVisible(index.data(GPad::VisibilityRole).toBool());
             }
         }
         
-        if (roles.contains(G::SelectionRole)) {
+        if (roles.contains(GPad::SelectionRole)) {
 //            qDebug() << __PRETTY_FUNCTION__ << "SelectionRole";
             for (int i = min; i <= max; ++i) {
                 QPersistentModelIndex index = mModel->index(i, 0);
-                bool v = mModel->data(index, G::SelectionRole).toBool();
+                bool v = mModel->data(index, GPad::SelectionRole).toBool();
                 
                 mIndexToNodes.value(index)->setSelected(v);
             }

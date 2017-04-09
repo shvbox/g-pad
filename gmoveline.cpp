@@ -3,7 +3,7 @@
 #include <math.h>
 #include <QPainter>
 
-#include "g.h"
+#include "gpad.h"
 #include "gmovenode.h"
 #include "gmove.h"
 #include "gmovesmodel.h"
@@ -66,12 +66,12 @@ void GMoveLine::paint(QPainter *painter, const QStyleOptionGraphicsItem */*optio
         
     } else {
         if (mDst) {
-            switch (mDst->index().data(G::MoveTypeRole).toInt()) {
+            switch (mDst->index().data(GPad::MoveTypeRole).toInt()) {
 //            case GMove::Extrusion:
 //                b.setColor(Qt::black);
 //                break;
                 
-            case GMove::Traverse:
+            case GMove::Travel:
                 b.setColor(Qt::darkGreen);
                 break;
                 

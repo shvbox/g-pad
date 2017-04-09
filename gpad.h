@@ -1,7 +1,7 @@
-#ifndef G
-#define G
+#ifndef GPAD_H
+#define GPAD_H
 
-namespace G {
+namespace GPad {
     enum Roles{
         SelectionRole = Qt::UserRole,
         VisibilityRole,
@@ -11,12 +11,5 @@ namespace G {
     };
 }
 
-namespace Units {
-    enum SpeedUnits {
-        mmPerMin,
-        mmPerS
-    };
-}
-
-#endif // G
+#endif // GPAD_H
 

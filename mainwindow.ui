@@ -71,6 +71,7 @@
     </widget>
     <addaction name="actionOpen"/>
     <addaction name="menuRecentFiles"/>
+    <addaction name="actionReload"/>
     <addaction name="actionClose"/>
     <addaction name="actionQuit"/>
    </widget>
@@ -285,12 +286,18 @@
        <property name="selectionBehavior">
         <enum>QAbstractItemView::SelectItems</enum>
        </property>
+       <property name="expandsOnDoubleClick">
+        <bool>false</bool>
+       </property>
       </widget>
      </item>
     </layout>
    </widget>
   </widget>
   <action name="actionOpen">
+   <property name="icon">
+    <iconset theme="fileopen"/>
+   </property>
    <property name="text">
     <string>&amp;Open...</string>
    </property>
@@ -304,6 +311,9 @@
    </property>
   </action>
   <action name="actionQuit">
+   <property name="icon">
+    <iconset theme="exit"/>
+   </property>
    <property name="text">
     <string>&amp;Quit</string>
    </property>
@@ -324,6 +334,14 @@
    </property>
    <property name="toolTip">
     <string>Filter visible</string>
+   </property>
+  </action>
+  <action name="actionReload">
+   <property name="icon">
+    <iconset theme="reload"/>
+   </property>
+   <property name="text">
+    <string>Reload</string>
    </property>
   </action>
  </widget>

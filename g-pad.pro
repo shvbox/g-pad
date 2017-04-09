@@ -19,8 +19,6 @@ SOURCES += main.cpp\
     ggraphicsproxy.cpp \
     gmoveline.cpp \
     gnavigatormodel.cpp \
-    gnavigatoritem.cpp \
-    gnavigator.cpp \
     gfilterproxy.cpp \
     gnavigatorview.cpp
 
@@ -36,11 +34,9 @@ HEADERS  += mainwindow.h \
     ggraphicsproxy.h \
     gmoveline.h \
     gnavigatormodel.h \
-    gnavigatoritem.h \
-    gnavigator.h \
     gfilterproxy.h \
-    g.h \
-    gnavigatorview.h
+    gnavigatorview.h \
+    gpad.h
 
 FORMS    += mainwindow.ui
 
@@ -51,8 +47,8 @@ else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../gcodelib/build-gc
 else:unix:CONFIG(release, debug|release): LIBS += -L$$PWD/../../gcodelib/build-gcodelib-Desktop_Qt_5_5_1_GCC_64bit-Release/ -lgcodelib
 else:unix:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../gcodelib/build-gcodelib-Desktop_Qt_5_5_1_GCC_64bit-Debug/ -lgcodelib
 
-INCLUDEPATH += $$PWD/../../gcodelib
-DEPENDPATH += $$PWD/../../gcodelib
+INCLUDEPATH += $$PWD/../../gcodelib/gcodelib
+DEPENDPATH += $$PWD/../../gcodelib/gcodelib
 
 win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../../gcodelib/build-gcodelib-Desktop_Qt_5_5_1_GCC_64bit-Debug/release/libgcodelib.a
 else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../../gcodelib/build-gcodelib-Desktop_Qt_5_5_1_GCC_64bit-Debug/debug/libgcodelib.a

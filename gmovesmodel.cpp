@@ -3,6 +3,7 @@
 #include <QFont>
 #include <QBrush>
 #include <QDebug>
+#include "gpad.h"
 #include "gcode.h"
 
 GMovesModel::GMovesModel(GCode *data, QObject *parent)
@@ -27,15 +28,15 @@ QVariant GMovesModel::data(const QModelIndex &index, int role) const
     int col = index.column();
     
     switch(role){
-    case G::MoveXYRole: 
+    case GPad::MoveXYRole: 
         return mGCode->XY(move);
         break;
         
-    case G::MoveZRole: 
+    case GPad::MoveZRole: 
         return mGCode->Z(move);
         break;
         
-    case G::MoveTypeRole: 
+    case GPad::MoveTypeRole: 
         return mGCode->moveType(move);
         break;
         
@@ -52,17 +53,17 @@ QVariant GMovesModel::data(const QModelIndex &index, int role) const
         case EColumn:
             return QString::number(mGCode->E(move));
         case EEffectiveColumn:
-            return QString::number(mGCode->EE(move));
+            return QString::number(mGCode->Ee(move));
         case ETotalColumn:
             return QString::number(mGCode->ET(move),'f', 4);
         case FColumn:
             return QString::number(mGCode->F(move));
         case FEffectiveColumn:
-            return QString::number(mGCode->FE(move));
+            return QString::number(mGCode->Fe(move));
         case DistanceColumn:
             return QString::number(mGCode->distance(move));
         case dEColumn:
-            return QString::number(mGCode->dEE(move));
+            return QString::number(mGCode->dEe(move));
         case FlowColumn:
             return QString::number(mGCode->flow(move));
         case BedColumn:

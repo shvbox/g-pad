@@ -29,6 +29,7 @@ public:
     
 public slots:
     void openFile(const QString &path = QString());
+    void reloadFile();
     
 private slots:
     void resizeTableColumns();
@@ -49,6 +50,7 @@ private:
     void setCurrentFile(const QString &fileName);
     void updateRecentFileActions();
     QString strippedName(const QString &fullFileName);
+    QString mostRecentPath();
 
     Ui::MainWindow *ui;
     
@@ -64,8 +66,10 @@ private:
     
     GNavigatorModel *mNavModel;
     
-    enum { MaxRecentFiles = 5 };
+    enum { MaxRecentFiles = 10 };
     QAction *mRecentFileActs[MaxRecentFiles];
+    
+    QString mCurrentFileName;
 };
 
 #endif // MAINWINDOW_H

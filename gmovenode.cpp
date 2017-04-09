@@ -4,7 +4,7 @@
 #include <QPointF>
 #include <QDebug>
 
-#include "g.h"
+#include "gpad.h"
 #include "gmove.h"
 #include "gmovesmodel.h"
 
@@ -19,8 +19,8 @@ GMoveNode::GMoveNode(const QPersistentModelIndex &index, QGraphicsItem *parent)
       mIndex(index)
 {
     setFlag(ItemIsSelectable);// | QGraphicsItem::ItemIsMovable);
-    setPos(mIndex.data(G::MoveXYRole).toPointF());
-    setZValue(mIndex.data(G::MoveZRole).toDouble());
+    setPos(mIndex.data(GPad::MoveXYRole).toPointF());
+    setZValue(mIndex.data(GPad::MoveZRole).toDouble());
 }
 
 QRectF GMoveNode::boundingRect() const
@@ -30,14 +30,16 @@ QRectF GMoveNode::boundingRect() const
 
 void GMoveNode::paint(QPainter *painter, const QStyleOptionGraphicsItem */*option*/, QWidget */*widget*/)
 {
-    QColor c(mIndex.data(G::SelectionRole).toBool() ? Qt::red : Qt::blue);
+    bool selected = mIndex.data(GPad::SelectionRole).toBool();
+    QColor c(selected ? Qt::red : Qt::blue);
+    c.setAlpha(0xaa);
     
-    int type = mIndex.data(G::MoveTypeRole).toInt();
+    int type = mIndex.data(GPad::MoveTypeRole).toInt();
     
-    if (type == GMove::RetractPrime) {
+    if (type == GMove::DestringPrime) {
         painter->setPen(QPen(Qt::darkGreen, P));
         
-    } else if (type == GMove::RetractSuck) {
+    } else if (type == GMove::DestringSuck) {
         painter->setPen(QPen(Qt::gray, P));
             
     } else {

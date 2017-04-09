@@ -1,6 +1,6 @@
 #include "gfilterproxy.h"
 
-#include "g.h"
+#include "gpad.h"
 #include "gabstracttablemodel.h"
 
 #include <QDebug>
@@ -19,6 +19,7 @@ void GFilterProxy::toggleFilter(bool state)
 
 void GFilterProxy::clicked(const QModelIndex &index)
 {
+//    qDebug() << __PRETTY_FUNCTION__ << mapToSource(index);
     emit mouseClicked(mapToSource(index));
 }
 
@@ -26,7 +27,7 @@ void GFilterProxy::sourceDataChanged(const QModelIndex &topLeft, const QModelInd
 {
 //    qDebug() << __PRETTY_FUNCTION__ << mapFromSource(topLeft).row() << mapFromSource(bottomRight).row();
     emit dataChanged(mapFromSource(topLeft), mapFromSource(bottomRight), roles);
-    if (mDoFilter && roles.contains(G::VisibilityRole)) {
+    if (mDoFilter && roles.contains(GPad::VisibilityRole)) {
         invalidateFilter();
     }
 }
@@ -34,9 +35,8 @@ void GFilterProxy::sourceDataChanged(const QModelIndex &topLeft, const QModelInd
 bool GFilterProxy::filterAcceptsRow(int source_row, const QModelIndex &/*source_parent*/) const
 {
 //    qDebug() << __PRETTY_FUNCTION__ << source_row;
-    return !mDoFilter || sourceModel()->index(source_row, 0).data(G::VisibilityRole).toBool();
+    return !mDoFilter || sourceModel()->index(source_row, 0).data(GPad::VisibilityRole).toBool();
 }
-
 
 void GFilterProxy::setSourceModel(QAbstractItemModel *sourceModel)
 {

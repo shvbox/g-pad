@@ -7,6 +7,7 @@
 #include <QTableView>
 #include <QDebug>
 
+#include "gpad.h"
 #include "gcode.h"
 
 GAbstractTableModel::GAbstractTableModel(GCode *data, QObject *parent)
@@ -25,11 +26,14 @@ void GAbstractTableModel::clicked(const QModelIndex &index)
 {
     if (!(index.isValid() && index == mCurrentIndex)) return;
     
+    // Prevent recursion
     int line = targetToSource(index.row());
     int col = index.column();
+    Qt::KeyboardModifiers keyModifiers = mKeyModifiers;
+    mKeyModifiers = Qt::NoModifier;
 
     if (col == LineNumberColumn) {
-        switch (mKeyModifiers) {
+        switch (keyModifiers) {
         case Qt::SHIFT: {
             mGCode->show(line);
         }
@@ -47,7 +51,7 @@ void GAbstractTableModel::clicked(const QModelIndex &index)
         }
         
     } else {
-        switch (mKeyModifiers) {
+        switch (keyModifiers) {
         case Qt::SHIFT: {
             mGCode->select(line);
         }
@@ -64,7 +68,6 @@ void GAbstractTableModel::clicked(const QModelIndex &index)
             break;
         }
     }
-    mKeyModifiers = Qt::NoModifier;
 }
 
 void GAbstractTableModel::currentChanged(const QModelIndex &current)
@@ -141,7 +144,7 @@ void GAbstractTableModel::dataUpdated(int top, int bottom)
 void GAbstractTableModel::selectionUpdated(int top, int bottom)
 {
     QVector<int> roles;
-    roles << G::SelectionRole
+    roles << GPad::SelectionRole
           << Qt::FontRole
           << Qt::ForegroundRole
           << Qt::BackgroundRole
@@ -152,9 +155,9 @@ void GAbstractTableModel::selectionUpdated(int top, int bottom)
 
 void GAbstractTableModel::visibilityUpdated(int top, int bottom)
 {
-    //qDebug() << __PRETTY_FUNCTION__;
+//    qDebug() << __PRETTY_FUNCTION__ << top << bottom;
     QVector<int> roles;
-    roles << G::VisibilityRole
+    roles << GPad::VisibilityRole
           << Qt::FontRole
           << Qt::ForegroundRole
           << Qt::BackgroundRole
@@ -213,11 +216,11 @@ QVariant GAbstractTableModel::data(const QModelIndex &index, int role) const
     int col = index.column();
     
     switch(role){
-    case G::SelectionRole: 
+    case GPad::SelectionRole: 
         return mGCode->selected(row);
         break;
         
-    case G::VisibilityRole: 
+    case GPad::VisibilityRole: 
 //        qDebug() << __PRETTY_FUNCTION__ << "G::VisibilityRole" << row;
         return mGCode->visible(row);
         break;

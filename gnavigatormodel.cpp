@@ -5,6 +5,7 @@
 #include <QBrush>
 #include <QDebug>
 
+#include "gpad.h"
 #include "gnavigator.h"
 #include "gnavigatoritem.h"
 
@@ -25,7 +26,7 @@ GNavigatorModel::~GNavigatorModel()
 
 void GNavigatorModel::clicked(const QModelIndex &index)
 {
-    qDebug() << __PRETTY_FUNCTION__ << index.isValid() << (index.parent() == QModelIndex());
+//    qDebug() << __PRETTY_FUNCTION__ << index.isValid() << (index.parent() == QModelIndex());
 //    if (!(index.isValid() && index == mCurrentIndex && index.parent() == QModelIndex())) return;
     if (!(index.isValid() && index == mCurrentIndex)) return;
     
@@ -73,7 +74,7 @@ void GNavigatorModel::clicked(const QModelIndex &index)
 
 void GNavigatorModel::currentChanged(const QModelIndex &current)
 {
-    qDebug() << __PRETTY_FUNCTION__ << current.row();
+//    qDebug() << __PRETTY_FUNCTION__ << current.row();
     if (!current.isValid()) return;
     
     if (!mCurrentIndex.isValid() || current.parent() != mCurrentIndex.parent()) {
@@ -198,7 +199,9 @@ QVariant GNavigatorModel::data(const QModelIndex &index, int role) const
                     return QString("l=%1, lₑ=%2, ΔE'=%3").arg(info.l).arg(info.lE).arg(info.dE);
                     
                 case GNavigatorItem::Route:
-                    return QString("lₑ=%1, ΔE'=%2").arg(info.lE).arg(info.dE);
+                    return QString("lₑ=%1, ΔE'=%2, ΔEₗ'=%3, flow'=%4")
+                            .arg(info.lE).arg(info.dE).arg(info.dEl)
+                            .arg(qFuzzyCompare(info.lE + 1.0, 1.0) ? 0.0 : info.dEl / info.lE);
                     
                 default:
                     break;
@@ -350,7 +353,7 @@ void GNavigatorModel::dataUpdated(int top, int bottom)
 void GNavigatorModel::selectionUpdated(int top, int bottom)
 {
     QVector<int> roles;
-    roles << G::SelectionRole
+    roles << GPad::SelectionRole
           << Qt::FontRole
           << Qt::ForegroundRole
           << Qt::BackgroundRole
@@ -362,7 +365,7 @@ void GNavigatorModel::selectionUpdated(int top, int bottom)
 void GNavigatorModel::visibilityUpdated(int top, int bottom)
 {
     QVector<int> roles;
-    roles << G::VisibilityRole
+    roles << GPad::VisibilityRole
           << Qt::FontRole
           << Qt::ForegroundRole
           << Qt::BackgroundRole

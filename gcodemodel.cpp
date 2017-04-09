@@ -28,7 +28,7 @@ QVariant GCodeModel::data(const QModelIndex &index, int role) const
     switch(role){
     case Qt::DisplayRole:
         if (col == GCodeLineColumn) {
-            return mGCode->line(row);
+            return mGCode->text(row);
         }
         break;
     }
@@ -62,7 +62,7 @@ void GCodeModel::endResetData()
     mLongestLine = QString();
     int maxLen = mLongestLine.length();
     for (int i = 0; i < mGCode->linesCount(); ++i) {
-        QString line = mGCode->line(i);
+        QString line = mGCode->text(i);
         if (line.length() > maxLen) {
             mLongestLine = line;
             maxLen = mLongestLine.length();
