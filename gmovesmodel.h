@@ -13,6 +13,7 @@ public:
            XColumn,
            YColumn,
            ZColumn, 
+           RColumn, 
            EColumn, 
            EEffectiveColumn, 
            ETotalColumn, 

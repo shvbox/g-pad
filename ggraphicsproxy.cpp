@@ -6,7 +6,9 @@
 #include "gpad.h"
 #include "gmovesmodel.h"
 #include "gmovenode.h"
+#include "gmovearcnode.h"
 #include "gmoveline.h"
+#include "gmovearc.h"
 
 GGraphicsProxy::GGraphicsProxy(GMovesModel *model, QObject *parent)
     : QGraphicsScene(parent),
@@ -44,11 +46,22 @@ void GGraphicsProxy::resetData()
     GMoveNode* prevNode = NULL;
     for (int i = 0; i < mModel->rowCount(); ++i) {
         QPersistentModelIndex index = mModel->index(i, 0);
+        bool visible = index.data(GPad::VisibilityRole).toBool();
         GMoveNode* node = new GMoveNode(index);
-        node->setVisible(index.data(GPad::VisibilityRole).toBool());
+        node->setVisible(visible);
 
         addItem(node);
-        addItem(new GMoveLine(prevNode, node));
+        if (index.data(GPad::MoveArcDirectionRole).toInt() == 0) {
+            addItem(new GMoveLine(prevNode, node));
+            
+        } else {
+            GMoveArcNode* arcCenter = new GMoveArcNode(index);
+            arcCenter->setVisible(visible);
+            addItem(arcCenter);
+            
+            mIndexToArcNodes.insert(index, arcCenter);
+            addItem(new GMoveArc(prevNode, node, arcCenter));
+        }
         
         mIndexToNodes.insert(index, node);
         
@@ -82,6 +95,9 @@ void GGraphicsProxy::dataChanged(const QModelIndex &topLeft, const QModelIndex &
             for (int i = min; i <= max; ++i) {
                 QPersistentModelIndex index = mModel->index(i, 0);
                 mIndexToNodes.value(index)->setVisible(index.data(GPad::VisibilityRole).toBool());
+                if (mIndexToArcNodes.contains(index)) {
+                    mIndexToArcNodes.value(index)->setVisible(index.data(GPad::VisibilityRole).toBool());
+                }
             }
         }
         
@@ -92,6 +108,9 @@ void GGraphicsProxy::dataChanged(const QModelIndex &topLeft, const QModelIndex &
                 bool v = mModel->data(index, GPad::SelectionRole).toBool();
                 
                 mIndexToNodes.value(index)->setSelected(v);
+                if (mIndexToArcNodes.contains(index)) {
+                    mIndexToArcNodes.value(index)->setSelected(v);
+                }
             }
         }
     }

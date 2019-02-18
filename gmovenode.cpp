@@ -8,11 +8,11 @@
 #include "gmove.h"
 #include "gmovesmodel.h"
 
-static const qreal D = 0.06;
-static const qreal R = D / 2;
-static const qreal P = D / 3;
-static const qreal DP = D + 2 * P;
-static const qreal RP = R + P;
+static const qreal D = 0.06;        // Diameter
+static const qreal R = D / 2;       // Radius
+static const qreal P = D / 3;       // Perimeter width
+static const qreal DP = D + 2 * P;  // Outer size
+static const qreal RP = R + P;      // Radius + Perimeter
 
 GMoveNode::GMoveNode(const QPersistentModelIndex &index, QGraphicsItem *parent)
     : QGraphicsItem(parent),

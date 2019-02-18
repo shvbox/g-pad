@@ -18,7 +18,7 @@ int GMovesModel::rowCount(const QModelIndex &) const
 
 int GMovesModel::columnCount(const QModelIndex &) const
 {
-    return 16;
+    return 17;
 }
 
 QVariant GMovesModel::data(const QModelIndex &index, int role) const
@@ -36,6 +36,22 @@ QVariant GMovesModel::data(const QModelIndex &index, int role) const
         return mGCode->Z(move);
         break;
         
+    case GPad::MoveDistanceRole: 
+        return mGCode->length(move);
+        break;
+        
+    case GPad::MoveArcCenterRole: 
+        return mGCode->CXY(move);
+        break;
+        
+    case GPad::MoveArcRadiusRole: 
+        return mGCode->R(move);
+        break;
+        
+    case GPad::MoveArcDirectionRole: 
+        return mGCode->arcDirection(move);
+        break;
+        
     case GPad::MoveTypeRole: 
         return mGCode->moveType(move);
         break;
@@ -50,6 +66,8 @@ QVariant GMovesModel::data(const QModelIndex &index, int role) const
             return QString::number(mGCode->Y(move));
         case ZColumn:
             return QString::number(mGCode->Z(move));
+        case RColumn:
+            return QString::number(mGCode->R(move));
         case EColumn:
             return QString::number(mGCode->E(move));
         case EEffectiveColumn:
@@ -95,6 +113,8 @@ QVariant GMovesModel::headerData(int section, Qt::Orientation orientation, int r
                 return QString("Y");
             case ZColumn:
                 return QString("Z");
+            case RColumn:
+                return QString("R");
             case EColumn:
                 return QString("E");
             case EEffectiveColumn:

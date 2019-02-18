@@ -13,6 +13,7 @@ static const double Pi3 = Pi / 3;
 static const double Pi23 = Pi - Pi3;
 static const double TwoPi = 2.0 * Pi;
 
+// Arrow sizes
 static const qreal A = 0.1;
 static const qreal HA = A / 2;
 static const qreal W = 0;
@@ -42,20 +43,19 @@ void GMoveLine::adjust()
 
 QRectF GMoveLine::boundingRect() const
 {
-    
     return QRectF(mLine.p1(), mLine.p2()).normalized().adjusted(-ADJ, -ADJ, ADJ, ADJ);
 }
 
 void GMoveLine::paint(QPainter *painter, const QStyleOptionGraphicsItem */*option*/, QWidget */*widget*/)
 {
+//    if (!(mSrc->isVisible() || mDst->isVisible())) {
+    if (!mDst->isVisible()) {
+        return;
+    }
+
     qreal length = mLine.length();
     
     if (qFuzzyCompare(length + 1, qreal(1.0))) {
-        return;
-    }
-    
-//    if (!(mSrc->isVisible() || mDst->isVisible())) {
-    if (!mDst->isVisible()) {
         return;
     }
     

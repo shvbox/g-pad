@@ -7,7 +7,7 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        mainwindow.cpp \
+    mainwindow.cpp \
     gcodehighlighter.cpp \
     gmovesmodel.cpp \
     gabstracttablemodel.cpp \
@@ -20,7 +20,9 @@ SOURCES += main.cpp\
     gmoveline.cpp \
     gnavigatormodel.cpp \
     gfilterproxy.cpp \
-    gnavigatorview.cpp
+    gnavigatorview.cpp \
+    gmovearc.cpp \
+    gmovearcnode.cpp
 
 HEADERS  += mainwindow.h \
     gcodehighlighter.h \
@@ -36,7 +38,9 @@ HEADERS  += mainwindow.h \
     gnavigatormodel.h \
     gfilterproxy.h \
     gnavigatorview.h \
-    gpad.h
+    gpad.h \
+    gmovearc.h \
+    gmovearcnode.h
 
 FORMS    += mainwindow.ui
 

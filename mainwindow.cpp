@@ -3,7 +3,7 @@
 
 #include "gcode.h"
 #include "gnavigator.h"
-#include "gline.h"
+#include "gcodeline.h"
 #include "gcodemodel.h"
 #include "gmovesmodel.h"
 #include "gnavigatormodel.h"

@@ -7,6 +7,10 @@ namespace GPad {
         VisibilityRole,
         MoveXYRole,
         MoveZRole,
+        MoveDistanceRole,
+        MoveArcCenterRole,
+        MoveArcRadiusRole,
+        MoveArcDirectionRole,
         MoveTypeRole
     };
 }

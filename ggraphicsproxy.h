@@ -7,6 +7,7 @@
 class GMovesModel;
 class QModelIndex;
 class GMoveNode;
+class GMoveArcNode;
 
 class GGraphicsProxy : public QGraphicsScene
 {
@@ -30,6 +31,7 @@ private:
     qreal mMargin;
     
     QHash<QPersistentModelIndex, GMoveNode*> mIndexToNodes;
+    QHash<QPersistentModelIndex, GMoveArcNode*> mIndexToArcNodes;
     
     // QGraphicsScene interface
 protected:
