@@ -73,7 +73,7 @@ QVariant GMovesModel::data(const QModelIndex &index, int role) const
         case EEffectiveColumn:
             return QString::number(mGCode->Ee(move));
         case ETotalColumn:
-            return QString::number(mGCode->ET(move),'f', 4);
+            return QString::number(mGCode->ETe(move),'f', 4);
         case FColumn:
             return QString::number(mGCode->F(move));
         case FEffectiveColumn:

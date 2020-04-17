@@ -48,6 +48,7 @@ GTableView::GTableView(QWidget *parent)
 
 void GTableView::setModel(QAbstractItemModel *model)
 {
+    qDebug() << __PRETTY_FUNCTION__ << model->inherits("GAbstractTableModel");
     Q_ASSERT(model->inherits("GAbstractTableModel") || model->inherits("GFilterProxy"));
     QTableView::setModel(model);
 
@@ -70,9 +71,12 @@ void GTableView::setModel(QAbstractItemModel *model)
 
 void GTableView::currentChanged(const QModelIndex &current, const QModelIndex &previous)
 {
-//    qDebug() << __PRETTY_FUNCTION__ << current.row();
+//    qDebug() << __PRETTY_FUNCTION__ << (mGProxy && current.isValid()) << mGModel;
     QTableView::currentChanged(current, previous);
-    mGModel->currentChanged(mGProxy ? mGProxy->mapToSource(current) : current);
+    
+    if (mGModel) {
+        mGModel->currentChanged(mGProxy ? mGProxy->mapToSource(current) : current);
+    }
 }
 
 void GTableView::selectionChanged(const QItemSelection &selected, const QItemSelection &deselected)
@@ -83,10 +87,15 @@ void GTableView::selectionChanged(const QItemSelection &selected, const QItemSel
 
 void GTableView::scrollToCurrent()
 {
+    int row = currentIndex().row();
     if (mGProxy) {
-        scrollTo(mGProxy->index(currentIndex().row(), 0), QAbstractItemView::EnsureVisible);
-        scrollTo(mGProxy->index(currentIndex().row(), 0), QAbstractItemView::EnsureVisible); // Do not delete
+        if (mGProxy->hasIndex(row, 0)) {
+            scrollTo(mGProxy->index(row, 0), QAbstractItemView::EnsureVisible);
+            scrollTo(mGProxy->index(row, 0), QAbstractItemView::EnsureVisible); // Do not delete
+        }
     } else {
-        scrollTo(mGModel->index(currentIndex().row(), 0), QAbstractItemView::EnsureVisible);
+        if (mGModel->hasIndex(row, 0)) {
+            scrollTo(mGModel->index(row, 0), QAbstractItemView::EnsureVisible);
+        }
     }
 }

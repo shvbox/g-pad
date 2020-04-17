@@ -57,7 +57,7 @@
      <x>0</x>
      <y>0</y>
      <width>563</width>
-     <height>25</height>
+     <height>24</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuG_pad">
@@ -91,6 +91,8 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
+   <addaction name="actionOpen"/>
+   <addaction name="actionReload"/>
    <addaction name="actionFilter"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
@@ -296,7 +298,8 @@
   </widget>
   <action name="actionOpen">
    <property name="icon">
-    <iconset theme="fileopen"/>
+    <iconset theme="fileopen">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
     <string>&amp;Open...</string>
@@ -312,7 +315,8 @@
   </action>
   <action name="actionQuit">
    <property name="icon">
-    <iconset theme="exit"/>
+    <iconset theme="exit">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
     <string>&amp;Quit</string>
@@ -338,10 +342,17 @@
   </action>
   <action name="actionReload">
    <property name="icon">
-    <iconset theme="reload"/>
+    <iconset theme="reload">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
-    <string>Reload</string>
+    <string>&amp;Reload</string>
+   </property>
+   <property name="toolTip">
+    <string>Reload Current File</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+R</string>
    </property>
   </action>
  </widget>
@@ -350,17 +361,17 @@
   <customwidget>
    <class>GTableView</class>
    <extends>QTableView</extends>
-   <header location="global">gtableview.h</header>
+   <header>gtableview.h</header>
   </customwidget>
   <customwidget>
    <class>GGraphicsView</class>
    <extends>QGraphicsView</extends>
-   <header location="global">ggraphicsview.h</header>
+   <header>ggraphicsview.h</header>
   </customwidget>
   <customwidget>
    <class>GNavigatorView</class>
    <extends>QTreeView</extends>
-   <header location="global">gnavigatorview.h</header>
+   <header>gnavigatorview.h</header>
   </customwidget>
  </customwidgets>
  <resources>

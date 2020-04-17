@@ -116,7 +116,7 @@ void MainWindow::reloadFile()
 
 void MainWindow::loadFile(const QString &path)
 {
-    if (!mGCode->read(path)) {
+    if (!mGCode->readFile(path)) {
         QMessageBox::warning(this, tr("Open G-Code"),
                              tr("The g-code file could not be loaded."),
                              QMessageBox::Cancel);

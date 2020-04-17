@@ -72,6 +72,7 @@ void GAbstractTableModel::clicked(const QModelIndex &index)
 
 void GAbstractTableModel::currentChanged(const QModelIndex &current)
 {
+//    qDebug() << __PRETTY_FUNCTION__ << current.isValid();
     if (!current.isValid()) return;
     
     if (!mCurrentIndex.isValid()) {
